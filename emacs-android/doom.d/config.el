@@ -149,7 +149,7 @@
             #'tool-bar-event-apply-meta-modifier)
 (define-key key-translation-map
             [tool-bar keyboard-esc]
-            [escape])
+            (kbd "C-x C-c"))
 (define-key key-translation-map
             [tool-bar quit]
             (kbd "C-g"))
