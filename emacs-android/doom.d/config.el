@@ -282,6 +282,7 @@ with `org-cycle')."
 (add-hook 'after-init-hook
  (lambda ()
    (visual-line-mode -1)))
+(setq fill-column 70)
 
 ;;; recentf mode
 ;; (use-package recentf
