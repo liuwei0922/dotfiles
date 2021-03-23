@@ -1,4 +1,3 @@
-"------------------------------------------------------------------------------
 "-----------------------------基本配置-----------------------------------------
 "------------------------------------------------------------------------------
 "显示行号
@@ -89,12 +88,24 @@ let mapleader=" "
 "------------------------------插件管理----------------------------------------
 "------------------------------------------------------------------------------
 call plug#begin('~/.config/nvim/plugged')
+	"coc补全"
 	Plug 'neoclide/coc.nvim', {'branch': 'release'}
-	Plug 'tpope/vim-fugitive',
+	"git补全"
+	Plug 'tpope/vim-fugitive'
+	"文件管理"
 	Plug 'preservim/nerdtree'
+	"注释"
 	Plug 'preservim/nerdcommenter'
+	"状态栏"
 	Plug 'vim-airline/vim-airline'
+	"状态栏主题"
 	Plug 'vim-airline/vim-airline-themes'
+	"标签管理"
+	Plug 'godlygeek/tabular'
+	"markdown高亮"
+	Plug 'plasticboy/vim-markdown'
+	"markdown预览"
+	Plug 'iamcco/markdown-preview.nvim',{ 'do': 'cd app && yarn install'  }
 call plug#end()
 
 
@@ -147,6 +158,12 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#formatter = 'jsformatter'
 
 
+"------------------------------------------------------------------------------
+"------------------------------markdown高亮设置--------------------------------
+"------------------------------------------------------------------------------
+let g:vim_markdown_math = 1
+autocmd Filetype markdown noremap <leader>m :MarkdownPreview<CR>
+autocmd Filetype markdown noremap <leader>ms :MarkdownPreviewStop<CR>
 
 "------------------------------------------------------------------------------
 "------------------------------coc-nvim设置------------------------------------
