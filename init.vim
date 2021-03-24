@@ -1,5 +1,7 @@
 "-----------------------------基本配置-----------------------------------------
 "------------------------------------------------------------------------------
+"管理init.vim用
+set foldmethod=marker
 "显示行号
 set number
 "显示相对行号
@@ -88,6 +90,8 @@ let mapleader=" "
 "------------------------------插件管理----------------------------------------
 "------------------------------------------------------------------------------
 call plug#begin('~/.config/nvim/plugged')
+	"snippets"
+	Plug 'honza/vim-snippets'
 	"coc补全"
 	Plug 'neoclide/coc.nvim', {'branch': 'release'}
 	"git补全"
@@ -107,6 +111,14 @@ call plug#begin('~/.config/nvim/plugged')
 	"markdown预览"
 	Plug 'iamcco/markdown-preview.nvim',{ 'do': 'cd app && yarn install'  }
 call plug#end()
+
+
+
+"------------------------------------------------------------------------------
+"-----------------------------snippets快捷键设置------------------------------
+"------------------------------------------------------------------------------
+" assuming you want to use snipmate snippet engine
+"ActivateAddons vim-snippets snipmate
 
 
 "------------------------------------------------------------------------------
@@ -164,6 +176,7 @@ let g:airline#extensions#tabline#formatter = 'jsformatter'
 let g:vim_markdown_math = 1
 autocmd Filetype markdown noremap <leader>m :MarkdownPreview<CR>
 autocmd Filetype markdown noremap <leader>ms :MarkdownPreviewStop<CR>
+let g:mkdp_markdown_css = '/home/zihua/.config/Typora/themes/zj.css'
 
 "------------------------------------------------------------------------------
 "------------------------------tagbar高亮设置--------------------------------
