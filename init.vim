@@ -71,6 +71,17 @@ set autoread
 set list listchars=extends:❯,precedes:❮,tab:▸\ 
 "自动格式化 
 set formatoptions=tcrqn
+"将制表符转化成空格
+set expandtab
+"设置编辑时制表符占用空格数
+set tabstop=4
+"设置格式化时制表符占用空格数
+set shiftwidth=4
+"关闭softtabstop 永远不要将空格和tab混合输入
+set softtabstop=0
+"反馈延迟
+set ttimeoutlen=100
+set conceallevel=2
 
 
 "------------------------------------------------------------------------------
@@ -110,9 +121,44 @@ call plug#begin('~/.config/nvim/plugged')
 	Plug 'plasticboy/vim-markdown'
 	"markdown预览"
 	Plug 'iamcco/markdown-preview.nvim',{ 'do': 'cd app && yarn install'  }
+    "vimtex插件
+    Plug 'lervag/vimtex'
+    "输入法切换
+    Plug 'lilydjwg/fcitx.vim', {'branch': 'fcitx5'}
 call plug#end()
 
 
+"------------------------------------------------------------------------------
+"-----------------------------输入法快捷键设置------------------------------
+"------------------------------------------------------------------------------
+" let g:input_toggle = 0
+" function! Fcitx2en()
+"    let s:input_status = system("fcitx-remote")
+"    if s:input_status == 2
+"       let g:input_toggle = 1
+"       let l:a = system("fcitx-remote -c")
+"    endif
+" endfunction
+"
+" function! Fcitx2zh()
+"    let s:input_status = system("fcitx-remote")
+"    if s:input_status != 2 && g:input_toggle == 1
+"       let l:a = system("fcitx-remote -o")
+"       let g:input_toggle = 0
+"    endif
+" endfunction
+"
+" set ttimeoutlen=150
+" autocmd InsertLeave * call Fcitx2en()
+" autocmd InsertEnter * call Fcitx2zh()
+"
+"
+"------------------------------------------------------------------------------
+"-----------------------------vimtex快捷键设置------------------------------
+"------------------------------------------------------------------------------
+let g:tex_flavor='latex'
+let g:vimtex_view_method='zathura'
+let g:vimtex_quickfix_mode=0
 
 "------------------------------------------------------------------------------
 "-----------------------------snippets快捷键设置------------------------------
@@ -171,12 +217,108 @@ let g:airline#extensions#tabline#formatter = 'jsformatter'
 
 
 "------------------------------------------------------------------------------
-"------------------------------markdown高亮设置--------------------------------
+"------------------------------markdown设置------------------------------------
 "------------------------------------------------------------------------------
+"设置markdown下的本地leader键
+let maplocalleader = "/"
 let g:vim_markdown_math = 1
 autocmd Filetype markdown noremap <leader>m :MarkdownPreview<CR>
 autocmd Filetype markdown noremap <leader>ms :MarkdownPreviewStop<CR>
-let g:mkdp_markdown_css = '/home/zihua/.config/Typora/themes/zj.css'
+"减少手的移动，映射回车为<C-/>
+autocmd Filetype markdown inoremap <C-/> <CR>
+"标题快捷键
+autocmd Filetype markdown inoremap <localLeader>f <Esc>/<++><CR>:nohlsearch<CR>i<Del><Del><Del><Del>
+autocmd Filetype markdown inoremap <localLeader>1 <ESC>o#<Space><Enter><++><Esc>kA
+autocmd Filetype markdown inoremap <localLeader>2 <ESC>o##<Space><Enter><++><Esc>kA
+autocmd Filetype markdown inoremap <localLeader>3 <ESC>o###<Space><Enter><++><Esc>kA
+autocmd Filetype markdown inoremap <localLeader>4 <ESC>o####<Space><Enter><++><Esc>kA
+autocmd Filetype markdown inoremap <localLeader>5 <ESC>o#####<Space><Enter><++><Esc>kA
+" 空格，代码，段落
+autocmd Filetype markdown inoremap <localLeader>c ```<Enter><++><Enter>```<Enter><++><Enter><Esc>4kA
+autocmd Filetype markdown inoremap <localLeader>s ``<++><Esc>F`i
+autocmd Filetype markdown inoremap <localLeader>/ &emsp;<Esc>a
+autocmd Filetype markdown inoremap <localLeader><CR> <br><Esc>a
+"辅助实现自动编号,特意找了平时不用的键
+autocmd Filetype markdown inoremap <expr> <localLeader><F11> Count('^# \+',1)
+autocmd Filetype markdown inoremap <expr> <localLeader> <Leader> <F11> Count(' \\tag{\d\+-\d\+}',Findtitle())+1
+autocmd Filetype markdown inoremap <expr> <localLeader><F12> eval(Count('\[\^\d\+\]',1)+1)
+"行间公式，带自动编号
+autocmd Filetype markdown imap <localLeader>q <ESC>o$$<Enter><Enter> \tag{<localLeader><F11>-<Leader><localLeader><F11>}$$<Enter><BS><++><Esc>2kA
+"插入自动编号的引用
+autocmd Filetype markdown imap <localLeader>n [^<localLeader><F12>]<Esc>ya[Go<C-r>": <++><Esc><C-o>f]a
+"行内公式，由snippets取代，不再用这里的定义，快捷键不变
+autocmd Filetype markdown inoremap <localLeader>e $$<++><Esc>F$i
+"也是公式，基本不用
+autocmd Filetype markdown inoremap <localLeader>m $$\begin{equation}<Enter><Enter>\end{equation}$$<Enter><++><Esc>2kA
+"粗体
+autocmd Filetype markdown inoremap <localLeader>b ****<++><Esc>F*hi
+"下划线
+autocmd Filetype markdown inoremap <localLeader>u <u></u><++><Esc>F/i<Left>
+"斜体
+autocmd Filetype markdown inoremap <localLeader>i **<++><Esc>F*i
+"删除线
+autocmd Filetype markdown inoremap <localLeader>d ~~~~<++><Esc>F~hi
+"插入时间戳
+autocmd Filetype markdown inoremap <F2> <br><br><Esc>o> *以下内容更新于<C-R>=strftime('%Y-%m-%d %H:%M:%S')<C-M>*<Down><Esc>o<CR>
+"分隔线
+autocmd Filetype markdown inoremap <localLeader>l <ESC>o--------<Enter>
+"函数
+" 计算某个pattern从startline到光标处出现的次数
+function! Count(pattern,startline)
+  let l:cnt = 0
+  silent! exe a:startline . ',.s/' . a:pattern . '/\=execute(''let l:cnt += 1'')/gn'
+  return l:cnt
+endfunction
+"计算markdown中一级标题出现的次数，用来给公式自动编号
+function! Findtitle()
+    for i in range(line('.'))
+        if matchstr(getline(line('.')-i),'^# \+')!=#''
+            let l:latesttitleline=line('.')-i
+            break
+        else
+            let l:latesttitleline=line('.')
+        endif
+    endfor
+    return l:latesttitleline
+endfunction
+" 计算某个pattern从startline到光标处出现的次数
+function! Count(pattern,startline)
+  let l:cnt = 0
+  silent! exe a:startline . ',.s/' . a:pattern . '/\=execute(''let l:cnt += 1'')/gn'
+  return l:cnt
+endfunction
+".Md文件也能被识别为markdown
+autocmd BufNewFile,BufRead *.Md set filetype=markdown
+"ejs识别为html
+autocmd BufNewFile,BufRead *.ejs set filetype=html
+
+"markdown-preview设置
+let g:mkdp_preview_options = {
+    \ 'mkit': {},
+    \ 'katex': {},
+    \ 'uml': {},
+    \ 'maid': {},
+    \ 'disable_sync_scroll': 0,
+    \ 'sync_scroll_type': 'middle',
+    \ 'hide_yaml_meta': 1,
+    \ 'sequence_diagrams': {},
+    \ 'flowchart_diagrams': {}
+    \ }
+let g:mkdp_markdown_css = '/home/zihua/themes/zj.css'
+" preview page title
+" ${name} will be replace with the file name
+let g:mkdp_page_title = '「${name}」'
+"Vim-markdown设置
+let g:vim_markdown_math = 2
+let g:tex_conceal ='adbmg'
+let g:vim_markdown_conceal_code_blocks = 0
+let g:vim_markdown_folding_disabled = 1
+let g:vim_markdown_no_default_key_mappings = 1
+let g:vim_markdown_toc_autofit = 1
+let g:vim_markdown_folding_level = 1
+let g:vim_markdown_auto_insert_bullets = 0
+let g:vim_markdown_strikethrough = 0
+let g:vim_markdown_new_list_item_indent = 0
 
 "------------------------------------------------------------------------------
 "------------------------------tagbar高亮设置--------------------------------
@@ -333,21 +475,21 @@ set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 
 " Mappings for CoCList
 " Show all diagnostics.
-nnoremap <silent><nowait> <space>a  :<C-u>CocList diagnostics<cr>
+nnoremap <silent><nowait><leader> <space>a  :<C-u>CocList diagnostics<cr>
 " Manage extensions.
-nnoremap <silent><nowait> <space>e  :<C-u>CocList extensions<cr>
+nnoremap <silent><nowait> <leader> <space>e  :<C-u>CocList extensions<cr>
 " Show commands.
-nnoremap <silent><nowait> <space>c  :<C-u>CocList commands<cr>
+nnoremap <silent><nowait> <leader> <space>c  :<C-u>CocList commands<cr>
 " Find symbol of current document.
-nnoremap <silent><nowait> <space>o  :<C-u>CocList outline<cr>
+nnoremap <silent><nowait> <leader> <space>o  :<C-u>CocList outline<cr>
 " Search workspace symbols.
-nnoremap <silent><nowait> <space>s  :<C-u>CocList -I symbols<cr>
+nnoremap <silent><nowait><leader>  <space>s  :<C-u>CocList -I symbols<cr>
 " Do default action for next item.
-nnoremap <silent><nowait> <space>j  :<C-u>CocNext<CR>
+nnoremap <silent><nowait> <leader> <space>j  :<C-u>CocNext<CR>
 " Do default action for previous item.
-nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
+nnoremap <silent><nowait> <leader> <space>k  :<C-u>CocPrev<CR>
 " Resume latest coc list.
-nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
+nnoremap <silent><nowait><leader>  <space>p  :<C-u>CocListResume<CR>
 
 
 "------------------------------------------------------------------------------
