@@ -81,7 +81,7 @@ set shiftwidth=4
 set softtabstop=0
 "反馈延迟
 set ttimeoutlen=100
-set conceallevel=2
+set conceallevel=1
 
 
 "------------------------------------------------------------------------------
@@ -243,13 +243,13 @@ autocmd Filetype markdown inoremap <expr> <localLeader><F11> Count('^# \+',1)
 autocmd Filetype markdown inoremap <expr> <localLeader> <Leader> <F11> Count(' \\tag{\d\+-\d\+}',Findtitle())+1
 autocmd Filetype markdown inoremap <expr> <localLeader><F12> eval(Count('\[\^\d\+\]',1)+1)
 "行间公式，带自动编号
-autocmd Filetype markdown imap <localLeader>q <ESC>o$$<Enter><Enter> \tag{<localLeader><F11>-<Leader><localLeader><F11>}$$<Enter><BS><++><Esc>2kA
+autocmd Filetype markdown imap <localLeader>q <ESC>o$$<Enter><Enter> \tag{ <localLeader><F11>-<localLeader><Leader><F11>}$$<Enter><BS><++><Esc>2kA
 "插入自动编号的引用
 autocmd Filetype markdown imap <localLeader>n [^<localLeader><F12>]<Esc>ya[Go<C-r>": <++><Esc><C-o>f]a
 "行内公式，由snippets取代，不再用这里的定义，快捷键不变
 autocmd Filetype markdown inoremap <localLeader>e $$<++><Esc>F$i
 "也是公式，基本不用
-autocmd Filetype markdown inoremap <localLeader>m $$\begin{equation}<Enter><Enter>\end{equation}$$<Enter><++><Esc>2kA
+autocmd Filetype markdown inoremap <localLeader>m $$$$<Enter><++><Esc>khi
 "粗体
 autocmd Filetype markdown inoremap <localLeader>b ****<++><Esc>F*hi
 "下划线
