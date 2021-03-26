@@ -77,3 +77,22 @@ unsigned 	usg	100
 main 	main	100
 include 	incl	100
 小时	xnui	100
+边界	bmjp	100
+复数	fuuu	100
+放置	fhvi	100
+虚数	xuuu	100
+向量	xlll	100
+极坐标	jzbn	100
+复变函数	fbhu	100
+柯西	kexi	100
+她们	tamf
+端点	drdm	100
+它们	tm
+连通	lmts	100
+相交	xljn	100
+常量	ihll	100
+总和	zshe
+定理	dkli	100
+奇点	jidm	100
+邻域	lbyu	100
+微分	wwff	100
