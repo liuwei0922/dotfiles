@@ -240,7 +240,7 @@ autocmd Filetype markdown inoremap <localLeader>/ &emsp;<Esc>a
 autocmd Filetype markdown inoremap <localLeader><CR> <br><Esc>a
 "辅助实现自动编号,特意找了平时不用的键
 autocmd Filetype markdown inoremap <expr> <localLeader><F11> Count('^# \+',1)
-autocmd Filetype markdown inoremap <expr> <localLeader> <Leader> <F11> Count(' \\tag{\d\+-\d\+}',Findtitle())+1
+autocmd Filetype markdown inoremap <expr> <localLeader><Leader><F11> Count(' \\tag{\d\+-\d\+}',Findtitle())+1
 autocmd Filetype markdown inoremap <expr> <localLeader><F12> eval(Count('\[\^\d\+\]',1)+1)
 "行间公式，带自动编号
 autocmd Filetype markdown imap <localLeader>q <ESC>o$$<Enter><Enter> \tag{ <localLeader><F11>-<localLeader><Leader><F11>}$$<Enter><BS><++><Esc>2kA
