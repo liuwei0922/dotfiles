@@ -115,7 +115,7 @@ call plug#begin('~/.config/nvim/plugged')
 	Plug 'vim-airline/vim-airline'
 	"状态栏主题"
 	Plug 'vim-airline/vim-airline-themes'
-	"标签管理"
+    "代码对齐
 	Plug 'godlygeek/tabular'
 	"markdown高亮"
 	Plug 'plasticboy/vim-markdown'
@@ -320,34 +320,6 @@ let g:vim_markdown_auto_insert_bullets = 0
 let g:vim_markdown_strikethrough = 0
 let g:vim_markdown_new_list_item_indent = 0
 
-"------------------------------------------------------------------------------
-"------------------------------tagbar高亮设置--------------------------------
-"------------------------------------------------------------------------------
-"设置tagber对于markdown的支持
-" let g:tagbar_type_markdown = {
-"     \ 'ctagstype' : 'markdown',
-"     \ 'kinds' : [
-"         \ 'h:Chapter',
-"         \ 'i:Section',
-"         \ 'k:Paragraph',
-"         \ 'j:Subparagraph'
-"     \ ]
-" \ }
-" "取消显示warning部分
-" let g:airline_section_warning = ''
-" "取消显示section_b
-" let g:airline_section_b = ''
-" "section_c显示为tagbar检索出来的标题
-" let g:airline_section_c = airline#section#create(['tagbar'])
-" "section_x显示文件名
-" let g:airline_section_x = '%{expand("%")}'
-" "section_y显示时间
-" let g:airline_section_y = airline#section#create(['%{strftime("%D")}'])
-" "section_z显示日期
-" let g:airline_section_z = airline#section#create(['%{strftime("%H:%M")}'])
-" "激活tagbar扩展
-" let g:airline#extensions#tagbar#enabled = 1
-"
 
 "------------------------------------------------------------------------------
 "------------------------------coc-nvim设置------------------------------------
@@ -359,19 +331,19 @@ set updatetime=300
 "不要发送信息到补全
 set shortmess+=c
 
-" Always show the signcolumn, otherwise it would shift the text each time
+" always show the signcolumn, otherwise it would shift the text each time
 " diagnostics appear/become resolved.
 if has("patch-8.1.1564")
-  " Recently vim can merge signcolumn and number column into one
+  " recently vim can merge signcolumn and number column into one
   set signcolumn=number
 else
   set signcolumn=yes
 endif
 
-" Use tab for trigger completion with characters ahead and navigate.
-" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
+" use tab for trigger completion with characters ahead and navigate.
+" note: use command ':verbose imap <tab>' to make sure tab is not mapped by
 " other plugin before putting this into your config.
-inoremap <silent><expr> <TAB>
+inoremap <silent><expr> <tab>
       \ pumvisible() ? "\<C-n>" :
       \ <SID>check_back_space() ? "\<TAB>" :
       \ coc#refresh()
