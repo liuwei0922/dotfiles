@@ -125,6 +125,8 @@ call plug#begin('~/.config/nvim/plugged')
     Plug 'lervag/vimtex'
     "输入法切换
     Plug 'lilydjwg/fcitx.vim', {'branch': 'fcitx5'}
+    " rust插件
+    Plug 'rust-lang/rust.vim'
 call plug#end()
 
 
