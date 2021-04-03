@@ -96,3 +96,15 @@ include 	incl	100
 奇点	jidm	100
 邻域	lbyu	100
 微分	wwff	100
+称作	igzo	100
+质点	vidm	100
+常数	ihuu	100
+法线	faxm	100
+位移	wwyi	100
+力矩	liju	100
+动量	dsll	100
+直角	vijn	100
+引力	ybli	100
+代入	ddru	100
+质心	vixb	100
+几何	jihe	100
