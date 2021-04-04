@@ -111,3 +111,4 @@ include 	incl	100
 矢量	uill	100
 蒋介石	jju	100
 程度	igdu	100
+统治	tsvi	100
