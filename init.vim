@@ -89,7 +89,7 @@ augroup resCur
   autocmd!
   autocmd BufReadPost * call setpos(".", getpos("'\""))
 augroup END
-不使用交换文件
+"不使用交换文件
 set noswapfile
 
 
