@@ -108,3 +108,6 @@ include 	incl	100
 代入	ddru	100
 质心	vixb	100
 几何	jihe	100
+矢量	uill	100
+蒋介石	jju	100
+程度	igdu	100

@@ -82,6 +82,13 @@ set softtabstop=0
 "反馈延迟
 set ttimeoutlen=100
 set conceallevel=1
+"vim中文换行问题
+set formatoptions+=m
+"记录光标位置
+augroup resCur
+  autocmd!
+  autocmd BufReadPost * call setpos(".", getpos("'\""))
+augroup END
 
 
 "------------------------------------------------------------------------------
