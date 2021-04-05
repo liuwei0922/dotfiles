@@ -83,7 +83,8 @@ set softtabstop=0
 set ttimeoutlen=100
 set conceallevel=1
 "vim中文换行问题
-set formatoptions+=m
+set formatoptions+=mB
+set breakat+=，。
 "记录光标位置
 augroup resCur
   autocmd!
