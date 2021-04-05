@@ -112,3 +112,7 @@ include 	incl	100
 蒋介石	jju	100
 程度	igdu	100
 统治	tsvi	100
+事实	uiui	100
+级数	jiuu	100
+高亮	gcll	100
+以外	yiw	100

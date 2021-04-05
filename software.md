@@ -7,6 +7,10 @@
 	- init.vim
 1. ranger安装
     - 终端文件管理
+1. base-devel
+    - yay 支持
+1. yay
+    - 安装用，包管理工具
 2. fcitx5
 	- rime 输入法，相关配置在windows下
 3. 小鹤双拼

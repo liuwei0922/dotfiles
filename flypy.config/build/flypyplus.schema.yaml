@@ -234,5 +234,5 @@ translator:
   enable_charset_filter: false
   enable_completion: false
   enable_sentence: false
-  enable_user_dict: ture 
+  enable_user_dict: false
   
