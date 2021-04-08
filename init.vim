@@ -1,3 +1,4 @@
+"------------------------------------------------------------------------------
 "-----------------------------基本配置-----------------------------------------
 "------------------------------------------------------------------------------
 "管理init.vim用
@@ -91,6 +92,10 @@ augroup resCur
 augroup END
 "不使用交换文件
 set noswapfile
+"突出当前行
+set cursorline
+" 退出插入模式指定类型的文件自动保存
+au InsertLeave *.go,*.sh,*.php,*.md write
 
 
 "------------------------------------------------------------------------------
@@ -105,67 +110,75 @@ let g:python3_host_prog="/usr/bin/python3"
 let mapleader=" "
 " 取消搜索后的高亮
 nnoremap <esc> :noh<return><esc>
-
+" ==== 系统剪切板复制粘贴 ====
+" v 模式下复制内容到系统剪切板
+vmap <Leader>c "+yy
+" n 模式下复制一行到系统剪切板
+nmap <Leader>c "+yy
+" n 模式下粘贴系统剪切板的内容
+nmap <Leader>v "+p
 
 
 "------------------------------------------------------------------------------
 "------------------------------插件管理----------------------------------------
 "------------------------------------------------------------------------------
 call plug#begin('~/.config/nvim/plugged')
-	"snippets"
-	Plug 'honza/vim-snippets'
-	"coc补全"
-	Plug 'neoclide/coc.nvim', {'branch': 'release'}
-	"git补全"
-	Plug 'tpope/vim-fugitive'
-	"文件管理"
-	Plug 'preservim/nerdtree'
-	"注释"
-	Plug 'preservim/nerdcommenter'
-	"状态栏"
-	Plug 'vim-airline/vim-airline'
-	"状态栏主题"
-	Plug 'vim-airline/vim-airline-themes'
+    "snippets"
+    Plug 'honza/vim-snippets'
+    "coc补全"
+    Plug 'neoclide/coc.nvim', {'branch': 'release'}
+    "git补全"
+    Plug 'tpope/vim-fugitive'
+    "文件管理"
+    Plug 'preservim/nerdtree'
+    "注释"
+    Plug 'preservim/nerdcommenter'
+    "状态栏"
+    Plug 'vim-airline/vim-airline'
+    "状态栏主题"
+    Plug 'vim-airline/vim-airline-themes'
     "代码对齐
-	Plug 'godlygeek/tabular'
-	"markdown高亮"
-	Plug 'plasticboy/vim-markdown'
-	"markdown预览"
-	Plug 'iamcco/markdown-preview.nvim',{ 'do': 'cd app && yarn install'  }
+    Plug 'godlygeek/tabular'
+    "markdown高亮"
+    Plug 'plasticboy/vim-markdown'
+    "markdown预览"
+    Plug 'iamcco/markdown-preview.nvim',{ 'do': 'cd app && yarn install'  }
     "vimtex插件
     Plug 'lervag/vimtex'
     "输入法切换
     Plug 'lilydjwg/fcitx.vim', {'branch': 'fcitx5'}
     " rust插件
     Plug 'rust-lang/rust.vim'
+    " go 主要插件
+    Plug 'fatih/vim-go', { 'tag': '*' }
+    " 配色方案
+    " colorscheme neodark
+    " Plug 'KeitaNakamura/neodark.vim'
+    " colorscheme monokai
+    " Plug 'crusoexia/vim-monokai'
+    " material主题
+    " Plug 'kaicataldo/material.vim', { 'branch': 'main' }
+    " ayu主题
+    Plug 'ayu-theme/ayu-vim'
+    " colorscheme github 
+    Plug 'acarapetis/vim-colors-github'
+    " colorscheme one 
+    Plug 'rakr/vim-one'
 call plug#end()
-
-
 "------------------------------------------------------------------------------
-"-----------------------------输入法快捷键设置------------------------------
+"-----------------------------主题配色设置------------------------------
 "------------------------------------------------------------------------------
-" let g:input_toggle = 0
-" function! Fcitx2en()
-"    let s:input_status = system("fcitx-remote")
-"    if s:input_status == 2
-"       let g:input_toggle = 1
-"       let l:a = system("fcitx-remote -c")
-"    endif
-" endfunction
-"
-" function! Fcitx2zh()
-"    let s:input_status = system("fcitx-remote")
-"    if s:input_status != 2 && g:input_toggle == 1
-"       let l:a = system("fcitx-remote -o")
-"       let g:input_toggle = 0
-"    endif
-" endfunction
-"
-" set ttimeoutlen=150
-" autocmd InsertLeave * call Fcitx2en()
-" autocmd InsertEnter * call Fcitx2zh()
-"
-"
+" 开启24bit的颜色，开启这个颜色会更漂亮一些
+set termguicolors
+"主题 
+let ayucolor="light"
+" IndentLine {{
+let g:indentLine_char = ''
+let g:indentLine_first_char = ''
+let g:indentLine_showFirstIndentLevel = 1
+let g:indentLine_setColors = 0
+" }}
+colorscheme ayu 
 "------------------------------------------------------------------------------
 "-----------------------------vimtex快捷键设置------------------------------
 "------------------------------------------------------------------------------
@@ -180,12 +193,37 @@ let g:vimtex_quickfix_mode=0
 "ActivateAddons vim-snippets snipmate
 
 
+"==============================================================================
+"===============================vim-go 插件====================================
+"==============================================================================
+let g:go_fmt_command = "goimports" " 格式化将默认的 gofmt 替换
+let g:go_autodetect_gopath = 1
+let g:go_list_type = "quickfix"
+
+let g:go_version_warning = 1
+let g:go_highlight_types = 1
+let g:go_highlight_fields = 1
+let g:go_highlight_functions = 1
+let g:go_highlight_function_calls = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_extra_types = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_generate_tags = 1
+
+let g:godef_split=2
+
+
 "------------------------------------------------------------------------------
 "------------------------------nerdtree快捷键设置------------------------------
 "------------------------------------------------------------------------------
+" let NERDTreeShowLineNumbers=1
+" 打开 vim 文件及显示书签列表
+let NERDTreeShowBookmarks=2
+" 设置宽度
+" let NERDTreeWinSize=31
 nnoremap <leader>n :NERDTreeFocus<CR>
-nnoremap <C-n> :NERDTree<CR>
-nnoremap <C-t> :NERDTreeToggle<CR>
+nnoremap <C-t> :NERDTree<CR>
+nnoremap <leader>t :NERDTreeToggle<CR>
 nnoremap <C-f> :NERDTreeFind<CR>
 
 
