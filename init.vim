@@ -84,7 +84,8 @@ set softtabstop=0
 set ttimeoutlen=100
 set conceallevel=1
 "vim中文换行问题
-set formatoptions+=mB
+set formatoptions+=M
+" set breakat+="，。"
 "记录光标位置
 augroup resCur
   autocmd!
@@ -117,6 +118,8 @@ vmap <Leader>c "+yy
 nmap <Leader>c "+yy
 " n 模式下粘贴系统剪切板的内容
 nmap <Leader>v "+p
+" 打开新的标签页
+nmap tn :tabnew 
 
 
 "------------------------------------------------------------------------------
@@ -164,6 +167,8 @@ call plug#begin('~/.config/nvim/plugged')
     Plug 'acarapetis/vim-colors-github'
     " colorscheme one 
     Plug 'rakr/vim-one'
+    " 设置toml高亮
+    Plug 'cespare/vim-toml'
 call plug#end()
 "------------------------------------------------------------------------------
 "-----------------------------主题配色设置------------------------------
