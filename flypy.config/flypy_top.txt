@@ -116,3 +116,5 @@ include 	incl	100
 级数	jiuu	100
 高亮	gcll	100
 以外	yiw	100
+互助	huvu	100
+主人	vurf	100
