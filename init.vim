@@ -37,7 +37,7 @@ set linebreak
 "折行后与编辑器边缘距离
 set wrapmargin=4
 "垂直滚动时，光标距离顶/低部的距离
-set scrolloff=5
+set scrolloff=10
 "总显示最后一个窗口的状态行
 set laststatus=2
 "状态栏显示光标位置，行/列
@@ -84,7 +84,7 @@ set softtabstop=0
 set ttimeoutlen=100
 set conceallevel=1
 "vim中文换行问题
-set formatoptions+=M
+"set formatoptions+=M
 " set breakat+="，。"
 "记录光标位置
 augroup resCur
@@ -120,6 +120,9 @@ nmap <Leader>c "+yy
 nmap <Leader>v "+p
 " 打开新的标签页
 nmap tn :tabnew 
+" 中文段落换行问题
+nmap j gj
+nmap k gk
 
 
 "------------------------------------------------------------------------------
