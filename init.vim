@@ -45,7 +45,7 @@ set ruler
 "括号对齐高亮
 set showmatch
 "总是显示标签栏
-set showtabline
+" set showtabline
 "搜索高亮显示
 set hlsearch
 "搜索忽略大小写
