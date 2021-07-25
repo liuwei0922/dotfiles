@@ -22,7 +22,7 @@ run volumeicon
 run conky -c $HOME/.config/awesome/system.conkyrc
 #you can set wallpapers in themes as well
 #feh --bg-fill /usr/share/backgrounds/arcolinux/arco-wallpaper.jpg &
-fcitx5 &
+run fcitx5
 vmware-user
 #run applications from startup
 #run firefox
