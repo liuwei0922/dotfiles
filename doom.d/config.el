@@ -55,3 +55,11 @@
 ;; they are implemented.
 ;;(setq package-archives '(("gnu" . "http://elpa.emacs-china.org/gnu/")
 ;;                        ("melpa" . "http://elpa.emacs-china.org/melpa/")))
+
+;;(after! org
+;; :init
+;; (cnfonts-enable))
+
+(use-package! cnfonts
+  :config
+  (cnfonts-enable))
