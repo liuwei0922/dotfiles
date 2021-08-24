@@ -128,3 +128,9 @@
                                     ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                                     ("\\paragraph{%s}" . "\\paragraph*{%s}")
                                     ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+;;调用打开tilix
+(defun tilix ()
+  "start a tilix instance based on the directory of current buffer."
+  (interactive)
+  (let ((tilix "tilix"))
+    (start-process tilix nil tilix (expand-file-name "./"))))
