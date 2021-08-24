@@ -87,11 +87,11 @@
   (setq org-latex-compiler "xelatex")
   (setq org-latex-pdf-process
         '(
-	  "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-	  "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-	  "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-	  "rm -fr %b.out %b.log %b.tex auto"
-	  ))
+          "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "rm -fr %b.out %b.log %b.tex auto"
+  ))
   (add-to-list 'org-latex-classes '("ctexart" "\\documentclass[11pt]{ctexart}
         [no-default-packages]
         \\usepackage[utf8]{inputenc}
