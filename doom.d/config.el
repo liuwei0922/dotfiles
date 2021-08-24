@@ -67,6 +67,8 @@
   (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
   (setq org-agenda-files '("~/org/agenda/"))
   (setq org-ellipsis "⤵")
+  ;;加入bilibili视频，其中链接为Bv号
+  (add-to-list 'org-link-abbrev-alist '("bilibili" . "https://www.bilibili.com/video/%s"))
   (plist-put! org-format-latex-options :scale 3))
 
 (after! org-superstar
