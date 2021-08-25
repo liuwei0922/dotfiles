@@ -53,8 +53,14 @@
 ;;
 ;; you can also try 'gd' (or 'c-c c d') to jump to their definition and see how
 ;; they are implemented.
-;;(setq package-archives '(("gnu" . "http://elpa.emacs-china.org/gnu/")
-;;                        ("melpa" . "http://elpa.emacs-china.org/melpa/")))
+
+;;关闭emacs不用再次确认
+(setq confirm-kill-emacs nil)
+
+;; 打开文件时, 光标自动定位到上次停留的位置
+(save-place-mode 1)
+
+
 
 ;;设置中英表格对齐
 (use-package! cnfonts
