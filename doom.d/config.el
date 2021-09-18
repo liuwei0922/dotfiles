@@ -54,6 +54,9 @@
 ;; you can also try 'gd' (or 'c-c c d') to jump to their definition and see how
 ;; they are implemented.
 
+;;设置代理
+(load! "+proxy")
+
 ;;关闭emacs不用再次确认
 (setq confirm-kill-emacs nil)
 
@@ -80,12 +83,9 @@
         org-superstar-remove-leading-stars t
         org-superstar-prettify-item-bullets t))
 
-(setq package-archives '(("gnu" . "http://elpa.emacs-china.org/gnu/")
-                         ("melpa" . "http://elpa.emacs-china.org/melpa/")
-                         ("melpa-stable" . "http://elpa.emacs-china.org/melpa-stable/")
-                         ("org" . "http://elpa.emacs-china.org/org/")))
-
-()
+(setq package-archives '(("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+                         ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
+(package-initialize)
 
 ;;设置org导出到pdf
 (with-eval-after-load 'ox-latex
@@ -142,11 +142,38 @@
   (let ((tilix "tilix"))
     (start-process tilix nil tilix (expand-file-name "./"))))
 
-;;快捷键绑定
+;;elfeed快捷键绑定
 (map! :leader :desc "open elfeed" "o e" #'elfeed)
+
+(map! :map elfeed-search-mode-map
+      :after elfeed-search
+      [remap kill-this-buffer] "q"
+      [remap kill-buffer] "q"
+      :n doom-leader-key nil
+      ;; :n "q" #'+rss/quit
+      :n "e" #'elfeed-update
+      :n "r" #'elfeed-search-untag-all-unread
+      :n "u" #'elfeed-search-tag-all-unread
+      :n "s" #'elfeed-search-live-filter
+      :n "RET" #'elfeed-search-show-entry
+      :n "P" #'elfeed-show-pdf
+      :n "+" #'elfeed-search-tag-all
+      :n "-" #'elfeed-search-untag-all
+      :n "S" #'elfeed-search-set-filter
+      :n "b" #'elfeed-search-browse-url
+      :n "y" #'elfeed-search-yank)
+
+(map! :map elfeed-show-mode-map
+      :after elfeed-search
+      :n "n" #'elfeed-show-next
+      :n "p" #'elfeed-show-prev)
 
 (use-package! elfeed-org
   :after elfeed
   :config
   (elfeed-org)
   (setq rmh-elfeed-org-files (list "~/org/elfeed.org")))
+(after! elfeed-search
+  (setq elfeed-search-filter "@2-week-ago +unread"))
+
+(add-to-list 'ispell-local-dictionary-alist "en_US")
