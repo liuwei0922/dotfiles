@@ -1,7 +1,7 @@
 ;;; ../repo/dotfiles/doom.d/+proxy.el -*- lexical-binding: t; -*-
 
-(defvar http-proxy "127.0.0.1:8889")
-(defvar socks-proxy "127.0.0.1:1089")
+(defvar http-proxy "192.168.196.1:10809")
+(defvar socks-proxy "192.168.196.1:10808")
 (defvar socks-server)
 (defvar socks-noproxy)
 

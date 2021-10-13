@@ -118,3 +118,4 @@ include 	incl	100
 以外	yiw	100
 互助	huvu	100
 主人	vurf	100
+给予	jiyu	100
