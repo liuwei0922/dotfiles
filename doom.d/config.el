@@ -16,12 +16,15 @@
 ;; + `doom-variable-pitch-font'
 ;; + `doom-big-font' -- used for `doom-big-font-mode'; use this for
 ;;   presentations or streaming.
-;;
+
 ;; they all accept either a font-spec, font string ("input mono-12"), or xlfd
 ;; font string. you generally only need these two:
-(setq doom-font (font-spec :family "monospace" :size 32 )
-      ;doom-variable-pitch-font (font-spec :family "sans" :size 13)
-      )
+
+;; ;; DON'T use (`font-family-list'), it's unreliable on Linux
+(setq   doom-font (font-spec :family "Fira Code" :size 28)
+        doom-variable-pitch-font (font-spec :family "Sarasa Mono SC" :size 32)
+        doom-unicode-font (font-spec :family "Sarasa Mono SC" :size 34)
+        doom-big-font (font-spec :family "Sarasa Mono SC" :size 28))
 
 ;; there are two ways to load a theme. both assume the theme is installed and
 ;; available. you can either set `doom-theme' or manually load a theme with the
@@ -66,12 +69,13 @@
 (save-place-mode 1)
 
 ;;设置中英表格对齐
-(use-package! cnfonts
-  :config
-  (cnfonts-enable))
+;;(use-package! cnfonts
+;;  :config
+;;  (cnfonts-enable))
 
 ;;org模式设置
 (after! (org)
+  (setq org-hide-emphasis-markers t)
   (setq org-log-done 'time)
   (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
   (setq org-agenda-files '("~/org/agenda/"))
@@ -179,3 +183,6 @@
   (setq elfeed-search-filter "@2-week-ago +unread"))
 
 (add-to-list 'ispell-local-dictionary-alist "en_US")
+
+;;设置 rust-mode
+(setq racer-rust-src-path "/home/zihua/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library")

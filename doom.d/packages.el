@@ -49,7 +49,6 @@
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;(unpin! t)
 
-(package! cnfonts)
 (package! cdlatex)
 (package! auctex)
 (package! org-superstar)
