@@ -186,3 +186,6 @@
 
 ;;设置 rust-mode
 (setq racer-rust-src-path "/home/zihua/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library")
+
+;;avy快捷键
+(map! :leader :desc "swiper-avy" "s a" #'swiper-avy)
