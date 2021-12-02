@@ -37,7 +37,7 @@
 
 ;; this determines the style of line numbers in effect. if set to `nil', line
 ;; numbers are disabled. for relative line numbers, set this to `relative'.
-(setq display-line-numbers-type 'relative)
+(setq display-line-numbers-type 't)
 
 
 ;; here are some additional functions/macros that could help you configure doom:
@@ -76,6 +76,7 @@
 ;;org模式设置
 (after! (org)
   (setq org-hide-emphasis-markers t)
+  (setq org-startup-folded 'show2levels)
   (setq org-log-done 'time)
   (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
   (setq org-agenda-files '("~/org/agenda/"))
@@ -88,10 +89,6 @@
   (setq org-superstar-headline-bullets-list '("◉" "○" "✸" "✿" "✤" "✜" "◆" )
         org-superstar-remove-leading-stars t
         org-superstar-prettify-item-bullets t))
-
-(setq package-archives '(("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-                         ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
-(package-initialize)
 
 ;;设置org导出到pdf
 (with-eval-after-load 'ox-latex
@@ -182,10 +179,39 @@
 (after! elfeed-search
   (setq elfeed-search-filter "@2-week-ago +unread"))
 
-(add-to-list 'ispell-local-dictionary-alist "en_US")
 
 ;;设置 rust-mode
 (setq racer-rust-src-path "/home/zihua/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library")
 
 ;;avy快捷键
 (map! :leader :desc "swiper-avy" "s a" #'swiper-avy)
+
+;;hunspell
+(add-to-list 'ispell-hunspell-dict-paths-alist '("en_US" "/usr/share/myspell/dicts/en_US"))
+(setq ispell-hunspell-dictionary-alist '(("en_US")))
+(setq ispell-alternate-dictionary "zh_CN")
+(add-to-list 'ispell-local-dictionary-alist "en_US")
+
+;;联网
+(defun link-web ()
+  "联网用"
+  (interactive)
+  (shell-command "python3 ~/repo/scripts/connect.py"))
+
+(map! :leader :desc "校园网连接" "l l" #'link-web)
+
+;;lsp-mode设置
+(after! (lsp-mode)
+  (setq lsp-diagnostics-provider :none)
+  (setq lsp-eldoc-enable-hover nil)
+  (setq lsp-eldoc-render-all nil)
+  (setq lsp-rust-show-hover-context nil)
+  (setq lsp-signature-doc-lines 1)
+  (setq lsp-signature-render-documentation nil))
+
+;;evil 设置
+(after! (evil)
+  (setcdr evil-insert-state-map nil)
+  (define-key evil-insert-state-map
+    (read-kbd-macro evil-toggle-key) 'evil-emacs-state)
+  (define-key evil-insert-state-map [escape] 'evil-normal-state))
