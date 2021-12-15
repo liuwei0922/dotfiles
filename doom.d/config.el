@@ -75,6 +75,11 @@
 
 ;;org模式设置
 (after! (org)
+  ;;设置上下标
+  (setq org-pretty-entities-include-sub-superscripts nil)
+  (setq org-export-with-sub-superscripts '{})
+  (setq org-use-sub-superscripts '{})
+  (setq org-show-context-detail t)
   (setq org-hide-emphasis-markers t)
   (setq org-startup-folded 'show2levels)
   (setq org-log-done 'time)
@@ -185,6 +190,7 @@
 
 ;;avy快捷键
 (map! :leader :desc "swiper-avy" "s a" #'swiper-avy)
+(map! :leader :desc "avy-next-line" "a l" #'avy-goto-line)
 
 ;;hunspell
 (add-to-list 'ispell-hunspell-dict-paths-alist '("en_US" "/usr/share/myspell/dicts/en_US"))
