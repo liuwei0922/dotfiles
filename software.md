@@ -10,6 +10,8 @@
 1. base-devel
     - yay 支持
 2. 打开 sshd 服务
+3. 安装 fd
+4. 安装 cmake
 1. yay
     - 安装用，包管理工具
 2. fcitx5
@@ -19,6 +21,7 @@
 4. 修改 .Xresources 文件
 	- Xft.dpi: 196
 5. 修改 lightdm.conf 等文件
+6. 安装 hunspell 词库
 6. 配置 vmware 挂载
 3. typora 
 	- markdown 编辑器
