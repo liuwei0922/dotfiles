@@ -88,6 +88,7 @@
   (setq org-ellipsis "⤵")
   ;;加入bilibili视频，其中链接为Bv号
   (add-to-list 'org-link-abbrev-alist '("bilibili" . "https://www.bilibili.com/video/%s"))
+  (add-to-list 'org-link-abbrev-alist '("mengbai" . "https://mzh.moegirl.org.cn/zh-hans/%s"))
   (plist-put! org-format-latex-options :scale 3))
 
 (after! org-superstar
@@ -202,7 +203,7 @@
 (defun link-web ()
   "联网用"
   (interactive)
-  (shell-command "python3 ~/repo/scripts/connect.py"))
+  (shell-command "python ~/repo/dotfiles/scripts/connect.py"))
 
 (map! :leader :desc "校园网连接" "l l" #'link-web)
 
