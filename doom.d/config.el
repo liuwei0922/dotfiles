@@ -75,6 +75,8 @@
 
 ;;org模式设置
 (after! (org)
+  ;;中文格式化
+  (load! "+chinese")
   ;;设置上下标
   (setq org-pretty-entities-include-sub-superscripts nil)
   (setq org-export-with-sub-superscripts '{})
