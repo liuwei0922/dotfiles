@@ -21,10 +21,10 @@
 ;; font string. you generally only need these two:
 
 ;; ;; DON'T use (`font-family-list'), it's unreliable on Linux
-(setq   doom-font (font-spec :family "Fira Code" :size 28)
-        doom-variable-pitch-font (font-spec :family "Sarasa Mono SC" :size 32)
-        doom-unicode-font (font-spec :family "Sarasa Mono SC" :size 34)
-        doom-big-font (font-spec :family "Sarasa Mono SC" :size 28))
+(setq   doom-font (font-spec :family "Fira Code" :size 14)
+        doom-variable-pitch-font (font-spec :family "Sarasa Mono SC" :size 18)
+        doom-unicode-font (font-spec :family "Sarasa Mono SC" :size 18)
+        doom-big-font (font-spec :family "Sarasa Mono SC" :size 18))
 
 ;; there are two ways to load a theme. both assume the theme is installed and
 ;; available. you can either set `doom-theme' or manually load a theme with the
@@ -57,6 +57,7 @@
 ;; you can also try 'gd' (or 'c-c c d') to jump to their definition and see how
 ;; they are implemented.
 
+
 (add-to-list 'auto-mode-alist '("\\.beancount\\'" . beancount-mode))
 
 ;;设置代理
@@ -65,18 +66,17 @@
 ;;关闭emacs不用再次确认
 (setq confirm-kill-emacs nil)
 
-;; 打开文件时, 光标自动定位到上次停留的位置
+;;打开文件时, 光标自动定位到上次停留的位置
 (save-place-mode 1)
-
-;;设置中英表格对齐
-;;(use-package! cnfonts
-;;  :config
-;;  (cnfonts-enable))
 
 ;;org模式设置
 (after! (org)
   ;;中文格式化
   (load! "+chinese")
+  (setq org-emphasis-regexp-components
+      '("-[:space:]('\"{" "-[:space:].,:!?;'\")}\\[" "[:space:]" "." 2))
+  (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components)
+  (org-element-update-syntax)
   ;;设置上下标
   (setq org-pretty-entities-include-sub-superscripts nil)
   (setq org-export-with-sub-superscripts '{})
@@ -92,6 +92,9 @@
   (add-to-list 'org-link-abbrev-alist '("bilibili" . "https://www.bilibili.com/video/%s"))
   (add-to-list 'org-link-abbrev-alist '("mengbai" . "https://mzh.moegirl.org.cn/zh-hans/%s"))
   (plist-put! org-format-latex-options :scale 3))
+
+;;输入法控制
+(add-hook! 'org-mode-hook #'toggle-input-method)
 
 (after! org-superstar
   (setq org-superstar-headline-bullets-list '("◉" "○" "✸" "✿" "✤" "✜" "◆" )
@@ -196,10 +199,10 @@
 (map! :leader :desc "avy-next-line" "a l" #'avy-goto-line)
 
 ;;hunspell
-(add-to-list 'ispell-hunspell-dict-paths-alist '("en_US" "/usr/share/myspell/dicts/en_US"))
-(setq ispell-hunspell-dictionary-alist '(("en_US")))
-(setq ispell-alternate-dictionary "zh_CN")
-(add-to-list 'ispell-local-dictionary-alist "en_US")
+;;(add-to-list 'ispell-hunspell-dict-paths-alist '("en_US" "/usr/share/myspell/dicts/en_US"))
+;;(setq ispell-hunspell-dictionary-alist '(("en_US")))
+;;(setq ispell-alternate-dictionary "zh_CN")
+;;(add-to-list 'ispell-local-dictionary-alist "en_US")
 
 ;;联网
 (defun link-web ()
@@ -219,8 +222,60 @@
   (setq lsp-signature-render-documentation nil))
 
 ;;evil 设置
+;;REPL 列表
+(setf my/repl-mode-list (make-list 1 'sly-mrepl-mode))
 (after! (evil)
   (setcdr evil-insert-state-map nil)
+  (setq evil-escape-key-sequence "jo")
+;;判断当前模式是否是 REPL 然后加自动 SAVE
+  (add-hook! 'evil-insert-state-exit-hook
+             (lambda ()
+                 (if (not (member major-mode my/repl-mode-list))
+                     (save-buffer))))
   (define-key evil-insert-state-map
     (read-kbd-macro evil-toggle-key) 'evil-emacs-state)
   (define-key evil-insert-state-map [escape] 'evil-normal-state))
+
+;;rime 设置
+(use-package! rime
+  :custom
+  (default-input-method "rime")
+  (rime-show-candidate 'minibuffer)
+  (rime-inline-ascii-trigger 'shift-l))
+
+(after! (vterm evil-collection)
+  (add-hook!
+   'vterm-mode-hook
+   (evil-collection-define-key '(normal insert) 'vterm-mode-map
+     (kbd "C-\\") 'toggle-input-method)))
+
+(map! :g "S-SPC" #'toggle-input-method)
+
+(defun rime-evil-escape-advice (orig-fun key)
+  "advice for `rime-input-method' to make it work together with `evil-escape'.
+Mainly modified from `evil-escape-pre-command-hook'"
+  (if rime--preedit-overlay
+;; if `rime--preedit-overlay' is non-nil, then we are editing something, do not abort
+(apply orig-fun (list key))
+    (when (featurep 'evil-escape)
+(let* (
+       (fkey (elt evil-escape-key-sequence 0))
+       (skey (elt evil-escape-key-sequence 1))
+       (evt (read-event nil nil evil-escape-delay))
+       )
+  (cond
+   ((and (characterp evt)
+	 (or (and (char-equal key fkey) (char-equal evt skey))
+	     (and evil-escape-unordered-key-sequence
+		  (char-equal key skey) (char-equal evt fkey))))
+    (evil-repeat-stop)
+    (evil-normal-state))
+   ((null evt) (apply orig-fun (list key)))
+   (t
+    (apply orig-fun (list key))
+    (if (numberp evt)
+	(apply orig-fun (list evt))
+      (setq unread-command-events (append unread-command-events (list evt))))))))))
+
+(advice-add 'rime-input-method :around #'rime-evil-escape-advice)
+

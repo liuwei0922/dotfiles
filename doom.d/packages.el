@@ -52,6 +52,7 @@
 (package! cdlatex)
 (package! auctex)
 (package! org-superstar)
+(package! rime)
 
 (unpin! cdlatex
         auctex
