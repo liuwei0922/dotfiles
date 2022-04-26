@@ -83,9 +83,9 @@
   (setq org-use-sub-superscripts '{})
   (setq org-show-context-detail t)
   (setq org-hide-emphasis-markers t)
-  (setq org-startup-folded 'show2levels)
+  (setq org-startup-folded t)
   (setq org-log-done 'time)
-  (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
+  (add-hook! 'org-mode-hook #'(lambda () (org-superstar-mode 1)))
   (setq org-agenda-files '("~/org/agenda/"))
   (setq org-ellipsis "⤵")
   ;;加入bilibili视频，其中链接为Bv号
@@ -230,7 +230,7 @@
 ;;判断当前模式是否是 REPL 然后加自动 SAVE
   (add-hook! 'evil-insert-state-exit-hook
              (lambda ()
-                 (if (not (member major-mode my/repl-mode-list))
+                 (when (not (member major-mode my/repl-mode-list))
                      (save-buffer))))
   (define-key evil-insert-state-map
     (read-kbd-macro evil-toggle-key) 'evil-emacs-state)
