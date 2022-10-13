@@ -85,13 +85,14 @@
   (setq org-hide-emphasis-markers t)
   (setq org-startup-folded t)
   (setq org-log-done 'time)
-  (add-hook! 'org-mode-hook #'(lambda () (org-superstar-mode 1)))
+  (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
   (setq org-agenda-files '("~/org/agenda/"))
   (setq org-ellipsis "⤵")
   ;;加入bilibili视频，其中链接为Bv号
   (add-to-list 'org-link-abbrev-alist '("bilibili" . "https://www.bilibili.com/video/%s"))
   (add-to-list 'org-link-abbrev-alist '("mengbai" . "https://mzh.moegirl.org.cn/zh-hans/%s"))
-  (plist-put! org-format-latex-options :scale 3))
+  ;;设置 latex 图片缩放比例
+  (plist-put! org-format-latex-options :scale 1.5))
 
 ;;输入法控制
 (add-hook! 'org-mode-hook #'toggle-input-method)
@@ -156,41 +157,6 @@
   (let ((tilix "tilix"))
     (start-process tilix nil tilix (expand-file-name "./"))))
 
-;;elfeed快捷键绑定
-(map! :leader :desc "open elfeed" "o e" #'elfeed)
-
-(map! :map elfeed-search-mode-map
-      :after elfeed-search
-      [remap kill-this-buffer] "q"
-      [remap kill-buffer] "q"
-      :n doom-leader-key nil
-      ;; :n "q" #'+rss/quit
-      :n "e" #'elfeed-update
-      :n "r" #'elfeed-search-untag-all-unread
-      :n "u" #'elfeed-search-tag-all-unread
-      :n "s" #'elfeed-search-live-filter
-      :n "RET" #'elfeed-search-show-entry
-      :n "P" #'elfeed-show-pdf
-      :n "+" #'elfeed-search-tag-all
-      :n "-" #'elfeed-search-untag-all
-      :n "S" #'elfeed-search-set-filter
-      :n "b" #'elfeed-search-browse-url
-      :n "y" #'elfeed-search-yank)
-
-(map! :map elfeed-show-mode-map
-      :after elfeed-search
-      :n "n" #'elfeed-show-next
-      :n "p" #'elfeed-show-prev)
-
-(use-package! elfeed-org
-  :after elfeed
-  :config
-  (elfeed-org)
-  (setq rmh-elfeed-org-files (list "~/org/elfeed.org")))
-(after! elfeed-search
-  (setq elfeed-search-filter "@2-week-ago +unread"))
-
-
 ;;设置 rust-mode
 (setq racer-rust-src-path "/home/zihua/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library")
 
@@ -204,13 +170,6 @@
 ;;(setq ispell-alternate-dictionary "zh_CN")
 ;;(add-to-list 'ispell-local-dictionary-alist "en_US")
 
-;;联网
-(defun link-web ()
-  "联网用"
-  (interactive)
-  (shell-command "python ~/repo/dotfiles/scripts/connect.py"))
-
-(map! :leader :desc "校园网连接" "l l" #'link-web)
 
 ;;lsp-mode设置
 (after! (lsp-mode)
@@ -228,8 +187,8 @@
   (setcdr evil-insert-state-map nil)
   (setq evil-escape-key-sequence "jo")
 ;;判断当前模式是否是 REPL 然后加自动 SAVE
-  (add-hook! 'evil-insert-state-exit-hook
-             (lambda ()
+  (add-hook 'evil-insert-state-exit-hook
+            (lambda ()
                  (when (not (member major-mode my/repl-mode-list))
                      (save-buffer))))
   (define-key evil-insert-state-map
@@ -244,7 +203,7 @@
   (rime-inline-ascii-trigger 'shift-l))
 
 (after! (vterm evil-collection)
-  (add-hook!
+  (add-hook
    'vterm-mode-hook
    (evil-collection-define-key '(normal insert) 'vterm-mode-map
      (kbd "C-\\") 'toggle-input-method)))
@@ -278,4 +237,16 @@ Mainly modified from `evil-escape-pre-command-hook'"
       (setq unread-command-events (append unread-command-events (list evt))))))))))
 
 (advice-add 'rime-input-method :around #'rime-evil-escape-advice)
+
+
+
+;; (defun my/link ()
+;;   "连接网络用"
+;;   (interactive)
+;;   (let* (
+;;         (url-http-target-url "http://10.2.5.251:801/eportal/?c=Portal&a=login&login_method=1&user_account=20195609%%40unicom&user_password=193114")
+;;         (code (url-http-create-request))
+;;         )
+;;     (if code
+;;         (message code))))
 
