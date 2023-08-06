@@ -21,10 +21,10 @@
 ;; font string. you generally only need these two:
 
 ;; ;; DON'T use (`font-family-list'), it's unreliable on Linux
-(setq   doom-font (font-spec :family "Fira Code" :size 14)
-        doom-variable-pitch-font (font-spec :family "Sarasa Mono SC" :size 18)
-        doom-unicode-font (font-spec :family "Sarasa Mono SC" :size 18)
-        doom-big-font (font-spec :family "Sarasa Mono SC" :size 18))
+;;(setq   doom-font (font-spec :family "Fira Code" :size 14)
+;;        doom-variable-pitch-font (font-spec :family "Sarasa Mono SC" :size 18)
+;;        doom-unicode-font (font-spec :family "Sarasa Mono SC" :size 18)
+;;        doom-big-font (font-spec :family "Sarasa Mono SC" :size 18))
 
 ;; there are two ways to load a theme. both assume the theme is installed and
 ;; available. you can either set `doom-theme' or manually load a theme with the
