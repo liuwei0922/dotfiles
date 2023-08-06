@@ -157,6 +157,8 @@
 ;; 状态栏显示时间
 (display-time-mode t)
 (setq display-time-day-and-date t)
+(setq system-time-locale "zh_CN.UTF-8")
+(setq display-time-format "%Y-%m-%d %A %H:%M")
 ;; 设置时间区域
 ;;(set (make-local-variable 'system-time-locale) "")
 ;;(setq display-time-format "%I " )
@@ -176,8 +178,7 @@
   :ensure t
   :hook (after-init . doom-modeline-mode)
   :config
-  (setq doom-modeline-icon nil
-	doom-modeline-height 35
+  (setq	doom-modeline-height 45
 	doom-modeline-buffer-name t
 	doom-modeline-lsp t
 	doom-modeline-buffer-modification-icon t
@@ -373,7 +374,6 @@ with `org-cycle')."
 	org-todo-keyword-faces '(("[-]"  . +org-todo-active)
 				 ("KILL" . +org-todo-cancel)))
   ;;时间戳设置
-  (setq system-time-locale "zh_CN.UTF-8")
   (setq org-time-stamp-formats '("<%Y-%m-%d %A>" . "<%Y-%m-%d %A %H:%M>"))
   ;; 启动时缩进
   (setq org-startup-indented t)
