@@ -149,11 +149,15 @@
 (blink-cursor-mode -1)
 ;; 高亮所在行
 (global-hl-line-mode t)
-;; 打开全屏
-(add-to-list 'default-frame-alist '(fullscreen . maximized))
 ;; 设置背景透明
 ;;(add-to-list 'default-frame-alist '(alpha-background . 70))
-(set-frame-parameter nil 'alpha '(90 . 100))
+(when (eq system-type 'windows-nt)
+  (set-frame-parameter nil 'alpha '(90 . 100))
+  )
+(when (eq system-type 'gnu/linux)
+  (setq default-frame-alist '((alpha-background . 85))))
+;; 打开全屏
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
 ;; 状态栏显示时间
 (display-time-mode t)
 (setq display-time-day-and-date t)
@@ -178,7 +182,8 @@
   :ensure t
   :hook (after-init . doom-modeline-mode)
   :config
-  (setq	doom-modeline-height 45
+  (setq doom-modeline-height 45
+	doom-modeline-icon nil
 	doom-modeline-buffer-name t
 	doom-modeline-lsp t
 	doom-modeline-buffer-modification-icon t
@@ -254,7 +259,8 @@
 	company-idle-delay 0.4
 	;; 补全字符开始数量
 	company-minimum-prefix-length 2
-	company-capf--sorted t)
+	company-capf--sorted t
+	)
   (use-package company-statistics
     :hook
     (after-init . company-statistics-mode)))
@@ -267,6 +273,10 @@
   (yas-indent-line 'fixed)
   :config
   (yas-global-mode))
+
+(use-package yasnippet-snippets
+  :after (yasnippet))
+
 
 ;;; ivy
 (use-package ivy
@@ -296,8 +306,8 @@
    ("C-x C-f" . counsel-find-file)
    ("C-x C-r" . counsel-recentf)
    ("C-h f" . counsel-describe-function)
-   ("C-h v" . counsel-describe-variable))
-  )
+   ("C-h v" . counsel-describe-variable)
+   ))
 
 ;;; swiper
 (use-package swiper
@@ -345,7 +355,8 @@ with `org-cycle')."
 	      ("C-'" . nil)
 	      ("M-l" . org-metaright)
 	      ("M-h" . org-metaleft)
-	      ("C-<tab>" . "M-<tab>"))
+	      ("C-<tab>" . "M-<tab>")
+	      ("C-c o" . counsel-outline))
   :hook
   (
   (org-mode . +open-flypy)
@@ -476,6 +487,7 @@ with `org-cycle')."
   (c++-ts-mode . eglot-ensure)
   :config
   (add-to-list 'eglot-server-programs '((c++-mode c++-ts-mode c-mode) "clangd")))
+(use-package eldoc)
 
 
 ;;; dirvish
@@ -490,17 +502,17 @@ with `org-cycle')."
   (setq delete-by-moving-to-trash t)
   (setq dired-listing-switches
         "-l --almost-all --human-readable --group-directories-first --no-group")
-  :bind ; Bind `dirvish|dirvish-side|dirvish-dwim' as you see fit
+  :bind	     ; Bind `dirvish|dirvish-side|dirvish-dwim' as you see fit
   (("C-c f" . dirvish-fd)
-   :map dirvish-mode-map ; Dirvish inherits `dired-mode-map'
+   :map dirvish-mode-map	   ; Dirvish inherits `dired-mode-map'
    ("a"   . dirvish-quick-access)
    ("f"   . dirvish-file-info-menu)
    ("y"   . dirvish-yank-menu)
    ("N"   . dirvish-narrow)
    ("^"   . dirvish-history-last)
-   ("h"   . dirvish-history-jump) ; remapped `describe-mode'
-   ("s"   . dirvish-quicksort)    ; remapped `dired-sort-toggle-or-edit'
-   ("v"   . dirvish-vc-menu)      ; remapped `dired-view-file'
+   ("h"   . dirvish-history-jump)	; remapped `describe-mode'
+   ("s"   . dirvish-quicksort)	; remapped `dired-sort-toggle-or-edit'
+   ("v"   . dirvish-vc-menu)	; remapped `dired-view-file'
    ("TAB" . dirvish-subtree-toggle)
    ("M-f" . dirvish-history-go-forward)
    ("M-b" . dirvish-history-go-backward)
@@ -512,17 +524,17 @@ with `org-cycle')."
    ("M-j" . dirvish-fd-jump)))
 
 ;;; tramp
-(use-package tramp
-  :config
-  ;; Enable full-featured Dirvish over TRAMP on certain connections
-  ;; https://www.gnu.org/software/tramp/#Improving-performance-of-asynchronous-remote-processes-1.
-  (add-to-list 'tramp-connection-properties
-               (list (regexp-quote "/ssh:YOUR_HOSTNAME:")
-                     "direct-async-process" t))
-  ;; Tips to speed up connections
-  (setq tramp-verbose 0)
-  (setq tramp-chunksize 2000)
-  (setq tramp-use-ssh-controlmaster-options nil))
+;; (use-package tramp
+;;   :config
+;;   ;; Enable full-featured Dirvish over TRAMP on certain connections
+;;   ;; https://www.gnu.org/software/tramp/#Improving-performance-of-asynchronous-remote-processes-1.
+;;   (add-to-list 'tramp-connection-properties
+;;                (list (regexp-quote "/ssh:YOUR_HOSTNAME:")
+;;                      "direct-async-process" t))
+;;   ;; Tips to speed up connections
+;;   (setq tramp-verbose 0)
+;;   (setq tramp-chunksize 2000)
+;;   (setq tramp-use-ssh-controlmaster-options nil))
 
 
 ;;; helpful
@@ -544,6 +556,10 @@ with `org-cycle')."
   ;;取消下划线
   (eshell-mode . (lambda () (setq global-hl-line-mode nil))))
 
+;;; vterm
+(use-package vterm
+  :ensure t)
+
 ;;; server
 (use-package server
   :config
@@ -553,13 +569,16 @@ with `org-cycle')."
 
 ;;; tree-sitter
 (use-package tree-sitter
-    :hook
-    (prog-mode . turn-on-tree-sitter-mode)
-    (tree-sitter-after-on . tree-sitter-hl-mode)
-    :config
-    (require tree-sitter-langs)
-    (setq major-mode-remap-alist
-	  '((c++-mode . c++-ts-mode))))
+  :hook
+  (prog-mode . turn-on-tree-sitter-mode)
+  (tree-sitter-after-on . tree-sitter-hl-mode)
+  :config
+  (require tree-sitter-langs)
+  (setq major-mode-remap-alist
+	'((c++-mode . c++-ts-mode)))
+  )
+
+
 ;; (require 'with-proxy )
 ;; (with-proxy
 ;;     :http-server "172.17.224.1:10811"
@@ -571,14 +590,6 @@ with `org-cycle')."
 ;;   :http-server "172.17.224.1:10811"
 ;;   )
 
-;; (use-package tree-sitter
-;;   :ensure t
-;;   :hook
-;;   (after-init . global-tree-sitter-mode)
-;;   (tree-sitter-after-on . tree-sitter-hl-mode)
-;;   :config
-;;   )
-
 
 ;;; 自定义函数
 ;;  快速打开配置
@@ -586,10 +597,6 @@ with `org-cycle')."
   "快速打开配置文件"
   (interactive)
   (find-file "c:/Users/qinmo/.emacs.d/init.el"))
-
-
-
-;;; 自定义的 HOOK
 
 
 ;;; 自定义快捷键
@@ -600,6 +607,33 @@ with `org-cycle')."
 ;; 设置 HELP-MODE 中的快捷键
 (define-key help-mode-map (kbd "n") (kbd "C-n"))
 (define-key help-mode-map (kbd "p") (kbd "C-p"))
+;; 设置 READ—ONLY-MODE 中的快捷键
+(defvar +read-only-mode-map (make-sparse-keymap)
+  "keymap for my read-only mode.")
+(define-key +read-only-mode-map (kbd "n") (kbd "C-n"))
+(define-key +read-only-mode-map (kbd "p") (kbd "C-p"))
+(define-key +read-only-mode-map (kbd "ll") (kbd "C-l"))
+(define-key +read-only-mode-map (kbd "f") (kbd "C-f"))
+(define-key +read-only-mode-map (kbd "b") (kbd "C-b"))
+(define-key +read-only-mode-map (kbd "i") #'read-only-mode)
+
+
+
+;;; 自定义的 HOOK
+;; (add-hook 'read-only-mode-hook #'(lambda ()
+;; 				   (use-local-map +read-only-mode-map)))
+
+;;; 自定义的 ADVICE
+(advice-add 'read-only-mode :around #'(lambda (orig-fun &rest args)
+					(cond ((and (boundp 'read-only-mode--state)
+						    read-only-mode--state)
+					       (let ()
+						 (apply orig-fun args)
+						 (use-local-map nil)))
+					      (t
+					       (apply orig-fun args)
+					       (use-local-map +read-only-mode-map)))))
+
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -608,12 +642,11 @@ with `org-cycle')."
  ;; If there is more than one, they won't work right.
  '(org-modules nil)
  '(package-selected-packages
-   '(tree-sitter-langs "tree-sitter" tree-sitter with-proxy helpful rime
-		       rust-mode ftable company-statistics wanderlust
-		       valign powerline quelpa-use-package quelpa
-		       diminish doom-themes expand-region
-		       gnu-elpa-keyring-update doom-modeline magit
-		       use-package ivy company))
+   '(vterm tree-sitter-langs "tree-sitter" tree-sitter with-proxy helpful
+	   rime rust-mode ftable company-statistics wanderlust valign
+	   powerline quelpa-use-package quelpa diminish doom-themes
+	   expand-region gnu-elpa-keyring-update doom-modeline magit
+	   use-package ivy company))
  '(warning-suppress-log-types '(((defvaralias losing-value org-tab-first-hook)) (comp)))
  '(warning-suppress-types '((use-package) (use-package))))
 (custom-set-faces
@@ -622,5 +655,6 @@ with `org-cycle')."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
 
 
