@@ -1,3 +1,5 @@
+;;; init.el -*- lexical-binding: t; -*-
+
 ;;; 设置用户名和邮箱
 (setq user-full-name "qinmoxiao")
 (setq user-mail-address "qinmoxiao@qq.com")
@@ -24,7 +26,7 @@
 	default-sendmail-coding-system 'utf-8-unix
 	default-terminal-coding-system 'utf-8-unix)
   )
-
+(setq buffer-file-coding-system 'utf-8-unix)
 
 ;; 禁止 NATIVE-COMPILE
 ;;(setq no-native-compile t)
@@ -81,12 +83,14 @@
 
 ;;; 加载包设置
 (require 'package)
-(setq package-archives '(("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-                         ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-			 ;;("melpa" . "http://1.15.88.122/melpa/")
+(setq package-archives '(;;("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+			 ("gnu" . "http://1.15.88.122/gnu/")
+                         ;;("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
+			 ("melpa" . "http://1.15.88.122/melpa/")
 			 ("nongnu" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/nongnu/")
 			 ("gnu-stable" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/stable-melpa/")
-			 ("gnu-devel" . "https://elpa.gnu.org/devel/")))
+			 ("gnu-devel" . "https://elpa.gnu.org/devel/")
+			 ))
 ;; 初始化包
 (setq package-check-signature nil)
 (package-initialize)
@@ -155,7 +159,8 @@
   (set-frame-parameter nil 'alpha '(90 . 100))
   )
 (when (eq system-type 'gnu/linux)
-  (setq default-frame-alist '((alpha-background . 85))))
+  (setq default-frame-alist '((alpha-background . 85)))
+  )
 ;; 打开全屏
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 ;; 状态栏显示时间
@@ -224,7 +229,7 @@
                                                            ((eq system-type 'windows-nt) 12.5)))
                                     nil 'prepend))
   ;; 设置中文字体
-  (cl-loop for font in '("思源黑体 CN" "思源宋体 CN" "微软雅黑 CN"
+  (cl-loop for font in '("Sarasa Mono SC" "微软雅黑 CN" "思源黑体 CN" "思源宋体 CN" 
                          "Source Han Sans CN" "Source Han Serif CN"
                          "WenQuanYi Micro Hei" "文泉驿等宽微米黑"
                          "Microsoft Yahei UI" "Microsoft Yahei")
@@ -325,6 +330,35 @@
   :ensure t
   :config (which-key-mode))
 
+
+;;; org-download
+;; (defun my-yank-image-from-win-clipboard-through-powershell()
+;;   "to simplify the logic, use c:/Users/Public as temporary directoy, and move it into current directoy"
+;;   (interactive)
+;;   (let* ((powershell "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe")
+;;          (file-name (format-time-string "screenshot_%Y%m%d_%H%M%S.png"))
+;;          ;; (file-path-powershell (concat "c:/Users/\$env:USERNAME/" file-name))
+;;          (file-path-wsl (concat "./images/" file-name))
+;;          )
+;;     ;; (shell-command (concat powershell " -command \"(Get-Clipboard -Format Image).Save(\\\"C:/Users/\\$env:USERNAME/" file-name "\\\")\""))
+;;     (shell-command (concat powershell " -command \"(Get-Clipboard -Format Image).Save(\\\"C:/Users/Public/" file-name "\\\")\""))
+;;     (rename-file (concat "/mnt/c/Users/Public/" file-name) file-path-wsl)
+;;     (insert (concat "[[file:" file-path-wsl "]]"))
+;;     (message "insert DONE.")
+;;     ))
+(use-package org-download
+  :ensure t
+  :hook ((org-mode dired-mode) . org-download-enable)
+  :config
+  (defun +org-download-method (link)
+    (org-download--fullname (org-link-unescape link)))
+  (setq org-download-method '+org-download-method)
+  (setq org-download-annotate-function (lambda (_link) "")
+        org-download-method 'attach
+	org-download-screenshot-method "powershell.exe -Command \"(Get-Clipboard -Format image).Save('$(wslpath -w %s)')\""
+        ))
+
+
 ;;; org-mode
 ;; 设置 TAB 键只有两层循环
 (defun +org-cycle-only-current-subtree-h (&optional arg)
@@ -394,7 +428,8 @@ with `org-cycle')."
   (setq org-export-with-sub-superscripts '{}
 	org-use-sub-superscripts '{}
 	org-use-sub-superscripts '{}
-	org-hide-emphasis-markers t)
+	org-hide-emphasis-markers t
+	org-pretty-entities t)
   ;; 启动时折叠内容
   (setq org-startup-folded t)
   ;; TODO 结束时加上时间
@@ -412,20 +447,113 @@ with `org-cycle')."
   ;; 加入萌百链接
   (add-to-list 'org-link-abbrev-alist '("mengbai" . "https://mzh.moegirl.org.cn/zh-hans/%s") t)
   ;; 设置 latex 图片缩放比例
-  (plist-put org-format-latex-options :scale 1.5))
+  (plist-put org-format-latex-options :scale 1.5)
+  (plist-put org-format-latex-options :background "Transparent")
+  (plist-put org-format-latex-options :foreground 'default)
+  (setq org-preview-latex-process-alist
+	'((dvipng :programs
+		  ("latex" "dvipng")
+		  :description "dvi > png" :message "you need to install the programs: latex and dvipng." :image-input-type "dvi" :image-output-type "png" :image-size-adjust
+		  (1.0 . 1.0)
+		  :latex-compiler
+		  ("latex -interaction nonstopmode -output-directory %o %F")
+		  :image-converter
+		  ("dvipng -D %D -T tight -o %O %F")
+		  :transparent-image-converter
+		  ("dvipng -D %D -T tight -bg Transparent -o %O %F"))
+	  (xdvsvgm :programs
+		   ("xelatex" "dvisvgm")
+		   :description "xdv > svg"
+		   :message "you need to install the programs: xelatex and dvisvgm."
+		   :image-input-type "xdv"
+		   :image-output-type "svg"
+		   :image-size-adjust (1.7 . 1.5)
+		   :latex-compiler
+		   ("xelatex -interaction nonstopmode -no-pdf -output-directory %o %F")
+		   :image-converter
+		   ("dvisvgm %F --no-fonts --exact-bbox --scale=%S --output=%O"))
+	  (imagemagick :programs
+		       ("latex" "convert")
+		       :description "pdf > png" :message "you need to install the programs: latex and imagemagick." :image-input-type "pdf" :image-output-type "png" :image-size-adjust
+		       (1.0 . 1.0)
+		       :latex-compiler
+		       ("pdflatex -interaction nonstopmode -output-directory %o %F")
+		       :image-converter
+		       ("convert -density %D -trim -antialias %F -quality 100 %O"))))
+  (setq org-preview-latex-default-process 'xdvsvgm)
+  (setq org-preview-latex-image-directory "~/org/ltximg/")
+  )
 
+
+;;; aas
+(use-package aas
+  :hook
+  (LaTeX-mode . aas-activate-for-major-mode)
+  (org-mode . aas-activate-for-major-mode)
+  :config
+  (aas-set-snippets 'text-mode
+    ;; expand unconditionally
+    ";o-" "¨­"
+    ";i-" "¨©"
+    ";a-" "¨¡"
+    ";u-" "¨±"
+    ";e-" "¨¥")
+  (aas-set-snippets 'latex-mode
+    ;; set condition!
+    :cond #'texmathp			; expand only while in math
+    "supp" "\\supp"
+    "On" "O(n)"
+    "O1" "O(1)"
+    "Olog" "O(\\log n)"
+    "Olon" "O(n \\log n)"
+    ;; Use YAS/Tempel snippets with ease!
+    "amin" '(yas "\\argmin_{$1}")   ; YASnippet snippet shorthand form
+    "amax" '(tempel "\\argmax_{" p "}") ; Tempel snippet shorthand form
+    ;; bind to functions!
+    ";ig" #'insert-register
+    ";call-sin"
+    (lambda (angle)			; Get as fancy as you like
+      (interactive "sAngle: ")
+      (insert (format "%s" (sin (string-to-number angle))))))
+  ;; disable snippets by redefining them with a nil expansion
+  (aas-set-snippets 'latex-mode
+    "supp" nil))
+
+
+;;; laas
+(use-package laas
+  :hook
+  (LaTeX-mode . laas-mode)
+  (org-mode . laas-mode)
+  :config				; do whatever here
+  (aas-set-snippets 'laas-mode
+    ;; set condition!
+    :cond #'texmathp			; expand only while in math
+    "supp" "\\supp"
+    "On" "O(n)"
+    "O1" "O(1)"
+    "Olog" "O(\\log n)"
+    "Olon" "O(n \\log n)"
+    ;; bind to functions!
+    "Sum" (lambda () (interactive)
+            (yas-expand-snippet "\\sum_{$1}^{$2} $0"))
+    "Span" (lambda () (interactive)
+             (yas-expand-snippet "\\Span($1)$0"))
+    ;; add accent snippets
+    :cond #'laas-object-on-left-condition
+    "qq" (lambda () (interactive) (laas-wrap-previous-object "sqrt"))))
 
 
 ;;; avy
 (use-package avy
   :ensure t
   :bind (:map global-map
-	 ("C-'" . avy-goto-char-timer) ; Control + 单引号
-         ;; 复用上一次搜索
-         ("C-c C-j" . avy-resume))
+	      ("C-'" . avy-goto-char-timer) ; Control + 单引号
+              ;; 复用上一次搜索
+              ("C-c C-j" . avy-resume))
   :config
-  (setq avy-background t ; 打关键字时给匹配结果加一个灰背景，更醒目
-        avy-all-windows t ; 搜索所有 window，即所有「可视范围」
+  (setq avy-background t    ; 打关键字时给匹配结果加一个灰背景，更醒目
+        avy-all-windows t   ; 搜索所有 window，即所有「可视范围」
         avy-timeout-seconds 0.3)) ; 「关键字输入完毕」信号的触发时间
 
 
@@ -558,7 +686,9 @@ with `org-cycle')."
 
 ;;; vterm
 (use-package vterm
-  :ensure t)
+  :ensure t
+  :hook
+  (vterm-mode . (lambda () (global-hl-line-mode -1))))
 
 ;;; server
 (use-package server
@@ -577,6 +707,13 @@ with `org-cycle')."
   (setq major-mode-remap-alist
 	'((c++-mode . c++-ts-mode)))
   )
+
+
+;;; fanyi
+(use-package fanyi
+  :ensure t)
+
+
 
 
 ;; (require 'with-proxy )
@@ -635,6 +772,40 @@ with `org-cycle')."
 					       (use-local-map +read-only-mode-map)))))
 
 
+;;; 设置 wsl 下的复制粘贴
+(when (and (getenv "WAYLAND_DISPLAY") (not (equal (getenv "GDK_BACKEND") "x11")))
+  (unless (executable-find "wl-copy")
+    (setq system-packages-use-sudo (executable-find "sudo")) ;container doesn't have "sudo" command
+    (shell-command "apt update")
+    (system-packages-install "wl-clipboard" " -y")
+    )
+  (setq wl-copy-process nil)
+  (defun wl-copy (text)
+    (setq wl-copy-process (make-process :name "wl-copy"
+					:buffer nil
+					:command '("wl-copy" "-f" "-n")
+					:connection-type 'pipe))
+    (process-send-string wl-copy-process text)
+    (process-send-eof wl-copy-process))
+  (defun wl-paste ()
+    (if (and wl-copy-process (process-live-p wl-copy-process))
+	nil	  ; should return nil if we're the current paste owner
+      (shell-command-to-string "wl-paste -n | tr -d \r")))
+  (setq interprogram-cut-function 'wl-copy)
+  (setq interprogram-paste-function 'wl-paste)
+  ;; (setq interprogram-cut-function
+  ;; 	(lambda (text)
+  ;; 	  ;; strangest thing: gui-select-text leads to gui-set-selection 'CLIPBOARD
+  ;; 	  ;; text -- if I eval that with some string, it mostly lands on the wayland
+  ;; 	  ;; clipboard, but not when it's invoked from this context.
+  ;; 	  ;; (gui-set-selection 'CLIPBOARD text)
+  ;; 	  ;; without the charset=utf-8 in type, emacs / wl-copy will crash when you paste emojis into a windows app
+  ;; 	  (start-process "wl-copy" nil "wl-copy" "--trim-newline"  "--type" "text/plain;charset=utf-8" text)))
+  )
+
+
+
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -642,11 +813,7 @@ with `org-cycle')."
  ;; If there is more than one, they won't work right.
  '(org-modules nil)
  '(package-selected-packages
-   '(vterm tree-sitter-langs "tree-sitter" tree-sitter with-proxy helpful
-	   rime rust-mode ftable company-statistics wanderlust valign
-	   powerline quelpa-use-package quelpa diminish doom-themes
-	   expand-region gnu-elpa-keyring-update doom-modeline magit
-	   use-package ivy company))
+   '(fanyi org-download xenops laas aas auto-package-update vterm tree-sitter-langs "tree-sitter" tree-sitter with-proxy helpful rime rust-mode ftable company-statistics wanderlust valign powerline quelpa-use-package quelpa diminish doom-themes expand-region gnu-elpa-keyring-update doom-modeline magit use-package ivy company))
  '(warning-suppress-log-types '(((defvaralias losing-value org-tab-first-hook)) (comp)))
  '(warning-suppress-types '((use-package) (use-package))))
 (custom-set-faces
