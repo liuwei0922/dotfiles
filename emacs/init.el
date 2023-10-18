@@ -78,7 +78,15 @@
 ;; 设置像素滚动
 (pixel-scroll-precision-mode t)
 
-;;
+;;浏览器设置 chrome
+(when (and (eq system-type 'gnu/linux)
+           (string-match
+            ".*microsoft.*"
+            (shell-command-to-string "uname -r")))
+  (setq
+   browse-url-generic-program  "/mnt/c/Windows/System32/cmd.exe"
+   browse-url-generic-args     '("/c" "start")
+   browse-url-browser-function #'browse-url-generic))
 
 
 ;;; 加载包设置
@@ -89,7 +97,7 @@
 			 ("melpa" . "http://1.15.88.122/melpa/")
 			 ("nongnu" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/nongnu/")
 			 ("gnu-stable" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/stable-melpa/")
-			 ("gnu-devel" . "https://elpa.gnu.org/devel/")
+			 ;;("gnu-devel" . "https://elpa.gnu.org/devel/")
 			 ))
 ;; 初始化包
 (setq package-check-signature nil)
@@ -163,6 +171,10 @@
   )
 ;; 打开全屏
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
+;; emacsclient frame
+(setq initial-frame-alist default-frame-alist)
+(add-to-list 'initial-frame-alist '(display . "127.0.0.1:0.0"))
+
 ;; 状态栏显示时间
 (display-time-mode t)
 (setq display-time-day-and-date t)
@@ -206,48 +218,53 @@
   "Check if font with FONT-NAME is available."
   (find-font (font-spec :name font-name)))
 ;; 设置 GUI 下的字体
-(when (display-graphic-p)
-  ;; 设置英语字体
-  (cl-loop for font in '("Consolas" "Cascadia Code" "SF Mono" "Source Code Pro"
-                         "Fira Code" "Menlo" "Monaco" "Dejavu Sans Mono"
-                         "Lucida Console" "SAS Monospace")
-           when (font-installed-p font)
-           return (set-face-attribute
-                   'default nil
-                   :font (font-spec :family font
-                                    :weight 'normal
-                                    :slant 'normal
-                                    :size (cond ((eq system-type 'gnu/linux) 30)
-                                                ((eq system-type 'windows-nt) 12.5)))))
-  ;; 设置 emoji 字体
-  (cl-loop for font in '("all-the-icons" "OpenSansEmoji" "Noto Color Emoji" "Segoe UI Emoji"
-                         "EmojiOne Color" "Apple Color Emoji" "Symbola" "Symbol")
-           when (font-installed-p font)
-           return (set-fontset-font t 'unicode
-                                    (font-spec :family font
-                                               :size (cond ((eq system-type 'gnu/linux) 30)
-                                                           ((eq system-type 'windows-nt) 12.5)))
-                                    nil 'prepend))
-  ;; 设置中文字体
-  (cl-loop for font in '("Sarasa Mono SC" "微软雅黑 CN" "思源黑体 CN" "思源宋体 CN" 
-                         "Source Han Sans CN" "Source Han Serif CN"
-                         "WenQuanYi Micro Hei" "文泉驿等宽微米黑"
-                         "Microsoft Yahei UI" "Microsoft Yahei")
-           when (font-installed-p font)
-           return (set-fontset-font t '(#x4e00 . #x9fff)
-                                    (font-spec :name font
-                                               :weight 'normal
-                                               :slant 'normal
-                                               :size (cond ((eq system-type 'gnu/linux) 32)
-                                                           ((eq system-type 'windows-nt) 13.5)))))
-  (cl-loop for font in '("HanaMinB" "SimSun-ExtB")
-           when (font-installed-p font)
-           return (set-fontset-font t '(#x20000 . #x2A6DF)
-                                    (font-spec :name font
-                                               :weight 'normal
-                                               :slant 'normal
-                                               :size (cond ((eq system-type 'gnu/linux) 32)
-                                                           ((eq system-type 'windows-nt) 12.5))))))
+(defun +init-font (&optional frame)
+  (when (display-graphic-p)
+    ;; 设置英语字体
+    (cl-loop for font in '("Consolas" "Cascadia Code" "SF Mono" "Source Code Pro"
+                           "Fira Code" "Menlo" "Monaco" "Dejavu Sans Mono"
+                           "Lucida Console" "SAS Monospace")
+             when (font-installed-p font)
+             return (set-face-attribute
+                     'default frame
+                     :font (font-spec :family font
+                                      :weight 'normal
+                                      :slant 'normal
+                                      :size (cond ((eq system-type 'gnu/linux) 30)
+                                                  ((eq system-type 'windows-nt) 12.5)))))
+    ;; 设置 emoji 字体
+    (cl-loop for font in '("all-the-icons" "OpenSansEmoji" "Noto Color Emoji" "Segoe UI Emoji"
+                           "EmojiOne Color" "Apple Color Emoji" "Symbola" "Symbol")
+             when (font-installed-p font)
+             return (set-fontset-font t 'unicode
+                                      (font-spec :family font
+						 :size (cond ((eq system-type 'gnu/linux) 30)
+                                                             ((eq system-type 'windows-nt) 12.5)))
+                                      nil 'prepend))
+    ;; 设置中文字体
+    (cl-loop for font in '("Sarasa Mono SC" "微软雅黑 CN" "思源黑体 CN" "思源宋体 CN" 
+                           "Source Han Sans CN" "Source Han Serif CN"
+                           "WenQuanYi Micro Hei" "文泉驿等宽微米黑"
+                           "Microsoft Yahei UI" "Microsoft Yahei")
+             when (font-installed-p font)
+             return (set-fontset-font t '(#x4e00 . #x9fff)
+                                      (font-spec :name font
+						 :weight 'normal
+						 :slant 'normal
+						 :size (cond ((eq system-type 'gnu/linux) 32)
+                                                             ((eq system-type 'windows-nt) 13.5)))))
+    (cl-loop for font in '("HanaMinB" "SimSun-ExtB")
+             when (font-installed-p font)
+             return (set-fontset-font t '(#x20000 . #x2A6DF)
+                                      (font-spec :name font
+						 :weight 'normal
+						 :slant 'normal
+						 :size (cond ((eq system-type 'gnu/linux) 32)
+                                                             ((eq system-type 'windows-nt) 12.5)))))))
+(if (daemonp)
+    (add-hook 'after-make-frame-functions #'+init-font)
+  (+init-font nil))
+
 (use-package all-the-icons
   :if (display-graphic-p))
 
@@ -450,6 +467,8 @@ with `org-cycle')."
   (plist-put org-format-latex-options :scale 1.5)
   (plist-put org-format-latex-options :background "Transparent")
   (plist-put org-format-latex-options :foreground 'default)
+  ;; org 中图片大小
+  (setq org-image-actual-width nil)
   (setq org-preview-latex-process-alist
 	'((dvipng :programs
 		  ("latex" "dvipng")
@@ -482,7 +501,50 @@ with `org-cycle')."
 		       ("convert -density %D -trim -antialias %F -quality 100 %O"))))
   (setq org-preview-latex-default-process 'xdvsvgm)
   (setq org-preview-latex-image-directory "~/org/ltximg/")
+  ;; (setq org-capture-templates
+  ;;       '(("t" "TODO" entry (file+headline as/gtd "Collect")
+  ;;       "* TODO %? %^G \n  %U" :empty-lines 1)
+  ;;       ("s" "Scheduled TODO" entry (file+headline as/gtd "Collect")
+  ;;       "* TODO %? %^G \nSCHEDULED: %^t\n  %U" :empty-lines 1)
+  ;;       ("d" "Deadline" entry (file+headline as/gtd "Collect")
+  ;;           "* TODO %? %^G \n  DEADLINE: %^t" :empty-lines 1)
+  ;;       ("p" "Priority" entry (file+headline as/gtd "Collect")
+  ;;       "* TODO [#A] %? %^G \n  SCHEDULED: %^t")
+  ;;       ("a" "Appointment" entry (file+headline as/gtd "Collect")
+  ;;       "* %? %^G \n  %^t")
+  ;;       ("l" "Link" entry (file+headline as/gtd "Collect")
+  ;;       "* TODO %a %? %^G\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n")
+  ;;       ("n" "Note" entry (file+headline as/gtd "Notes")
+  ;;           "* %? %^G\n%U" :empty-lines 1)
+  ;;       ("j" "Journal" entry (file+datetree "/Users/andrew/org/agenda/journal.org")
+  ;;       "* %? %^G\nEntered on %U\n")))
   )
+
+
+
+;;; denote
+(use-package denote
+  :bind
+  (("C-c n n" . denote)
+   ("C-c n i" . denote-link-or-create)
+   ("C-c n I" . denote-link)
+   ("C-c n b" . denote-link-backlinks)
+   ("C-c n a" . denote-add-front-matter)
+   ("C-c n r" . denote-rename-file)
+   ("C-c n R" . denote-rename-file-using-front-matter)
+   )
+  :config
+  (setq denote-directory (expand-file-name "~/org/notes/")
+      denote-known-keywords '("read")
+      denote-infer-keywords t
+      denote-sort-keywords t
+      denote-allow-multi-word-keywords t
+      denote-date-prompt-use-org-read-date t
+      denote-link-fontify-backlinks t
+      denote-front-matter-date-format 'org-timestamp
+      denote-prompts '(title keywords))
+  )
+
 
 
 ;;; aas
@@ -623,6 +685,7 @@ with `org-cycle')."
   :init
   (dirvish-override-dired-mode)
   :config
+  (setq dired-mouse-drag-files t)   
   (setq dirvish-mode-line-format
         '(:left (sort symlink) :right (omit yank index)))
   (setq dirvish-attributes
@@ -678,6 +741,14 @@ with `org-cycle')."
   ([remap describe-key] . helpful-key))
 
 
+;;; elisp-demos
+(use-package elisp-demos
+  :ensure t
+  :config
+  (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update)
+  )
+
+
 ;;; eshell
 (use-package eshell
   :hook
@@ -694,7 +765,12 @@ with `org-cycle')."
 (use-package server
   :config
   (if (not (server-running-p))
-      (server-start)))
+      (server-start))
+  (add-hook 'server-switch-hook #'(lambda ()
+				    (select-frame-set-input-focus (selected-frame))))
+  (add-hook 'server-switch-hook #'raise-frame)
+  )
+
 
 
 ;;; tree-sitter
@@ -792,16 +868,7 @@ with `org-cycle')."
 	nil	  ; should return nil if we're the current paste owner
       (shell-command-to-string "wl-paste -n | tr -d \r")))
   (setq interprogram-cut-function 'wl-copy)
-  (setq interprogram-paste-function 'wl-paste)
-  ;; (setq interprogram-cut-function
-  ;; 	(lambda (text)
-  ;; 	  ;; strangest thing: gui-select-text leads to gui-set-selection 'CLIPBOARD
-  ;; 	  ;; text -- if I eval that with some string, it mostly lands on the wayland
-  ;; 	  ;; clipboard, but not when it's invoked from this context.
-  ;; 	  ;; (gui-set-selection 'CLIPBOARD text)
-  ;; 	  ;; without the charset=utf-8 in type, emacs / wl-copy will crash when you paste emojis into a windows app
-  ;; 	  (start-process "wl-copy" nil "wl-copy" "--trim-newline"  "--type" "text/plain;charset=utf-8" text)))
-  )
+  (setq interprogram-paste-function 'wl-paste))
 
 
 
@@ -813,7 +880,7 @@ with `org-cycle')."
  ;; If there is more than one, they won't work right.
  '(org-modules nil)
  '(package-selected-packages
-   '(fanyi org-download xenops laas aas auto-package-update vterm tree-sitter-langs "tree-sitter" tree-sitter with-proxy helpful rime rust-mode ftable company-statistics wanderlust valign powerline quelpa-use-package quelpa diminish doom-themes expand-region gnu-elpa-keyring-update doom-modeline magit use-package ivy company))
+   '(denote elisp-demos fanyi org-download xenops laas aas auto-package-update vterm tree-sitter-langs "tree-sitter" tree-sitter with-proxy helpful rime rust-mode ftable company-statistics wanderlust valign powerline quelpa-use-package quelpa diminish doom-themes expand-region gnu-elpa-keyring-update doom-modeline magit use-package ivy company))
  '(warning-suppress-log-types '(((defvaralias losing-value org-tab-first-hook)) (comp)))
  '(warning-suppress-types '((use-package) (use-package))))
 (custom-set-faces
@@ -822,6 +889,7 @@ with `org-cycle')."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
 
 
 
