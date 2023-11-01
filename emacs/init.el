@@ -6,7 +6,7 @@
 
 
 ;;; 加载配置路径
-(add-to-list 'load-path (concat user-emacs-directory "lisp"))
+;;(add-to-list 'load-path (concat user-emacs-directory "lisp"))
 
 ;;; 文件相关设置
 ;; 设置环境变量
@@ -94,6 +94,7 @@
 (setq package-archives '(;;("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
 			 ("gnu" . "http://1.15.88.122/gnu/")
                          ;;("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
+			 ("melpa-stable" . "http://1.15.88.122/stable-melpa/")
 			 ("melpa" . "http://1.15.88.122/melpa/")
 			 ("nongnu" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/nongnu/")
 			 ("gnu-stable" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/stable-melpa/")
@@ -112,7 +113,7 @@
 
 
 (require 'use-package)
-(setq use-package-always-ensure t)
+;;(setq use-package-always-ensure t)
 
 ;; quelpa - For those packages which are not in MELPA
 (use-package quelpa
@@ -400,6 +401,13 @@ with `org-cycle')."
   (interactive)
   (set-input-method "rime"))
 
+
+;;; xenops
+(use-package xenops)
+;;(use-package org-fragtog)
+(setq display-mm-dimensions-alist '(("wayland-0" . (286 . 179))))
+(display-monitor-attributes-list)
+
 (use-package org
   :ensure t
   :bind (:map org-mode-map
@@ -407,22 +415,70 @@ with `org-cycle')."
 	      ("M-l" . org-metaright)
 	      ("M-h" . org-metaleft)
 	      ("C-<tab>" . "M-<tab>")
-	      ("C-c o" . counsel-outline))
+	      ("C-c o" . counsel-outline)
+	      ("M-=" . advance-words-count)
+	      )
   :hook
   (
-  (org-mode . +open-flypy)
-  (org-mode . (lambda () (display-line-numbers-mode -1)))
-  (org-mode . (lambda () (org-bullets-mode 1)))
-  (org-mode . (lambda () (setq truncate-lines nil)))
-;  (org-mode . (lambda () (valign-mode 1)))
-  )
+   (org-mode . +open-flypy)
+   (org-mode . (lambda () (display-line-numbers-mode -1)))
+   (org-mode . (lambda () (org-bullets-mode 1)))
+   (org-mode . (lambda () (setq truncate-lines nil)))
+   (org-mode . xenops-mode)
+   ;;(org-mode . org-fragtog-mode)
+   
+					;  (org-mode . (lambda () (valign-mode 1)))
+   )
   :config
   ;; 设置 ORG 标题样式
   (add-hook 'org-tab-first-hook #'+org-cycle-only-current-subtree-h)
   (use-package org-bullets)
   (with-no-warnings
     (custom-declare-face '+org-todo-active  '((t (:inherit (bold font-lock-constant-face org-todo)))) "")
-    (custom-declare-face '+org-todo-cancel  '((t (:inherit (bold error org-todo)))) ""))
+    ;;(custom-declare-face '+org-todo-cancel  '((t (:inherit (bold error org-todo)))) "")
+    (custom-declare-face '+org-todo-cancel '((t (:color "red"))) "")
+    )
+  ;; advance-words-count
+  (add-to-list 'load-path (concat user-emacs-directory "lisp/advance-words-count"))
+  (require 'advance-words-count)
+  (defun +words-count--format-message (cons &optional arg)
+    "Format a string to be shown for `words-count--message'.
+Using the CONS passed form `advance-words-count'. See
+`count-lines' & `count-words'. When ARG is specified, display
+verbosely."
+    (let ((start (car cons))
+          (end (cdr cons))
+          list)
+      (setq list (advance-words-count start end))
+      (format
+       (if arg
+           "
+-----------~*~ Words Count ~*~----------
+
+ Characters (without Space) .... %d
+ Characters (all) .............. %d
+ Number of Lines ............... %d
+ ANSCII Words .................. %d
+%s
+========================================
+"
+	 "汉字（除空格）：%d, 汉字（带空格）：%d, 行数：%d, ANSCI：%d, %s")
+       (cadr list)
+       (- end start)
+       (count-lines start end)
+       (car (last list))
+       (if (= 0 (car list))
+           (format (if arg
+                       " Latin Words ................... %d\n"
+                     "拉丁字母：%d")
+                   (count-words start end))
+	 (format (if arg
+                     " CJK Chars ..................... %d
+ Word Count .................... %d\n"
+                   "中日韩字符：%d, 中英文总字数：%d")
+		 (car list)
+		 (+ (car list) (car (last list))))))))
+  (advice-add 'words-count-message-function :override #'+words-count--format-message)
   ;; 设置表格对齐
   ;; (use-package valign
   ;;  :config
@@ -434,7 +490,7 @@ with `org-cycle')."
 				      "DONE(d)"
 				      "Kill(k)"))
 	org-todo-keyword-faces '(("[-]"  . +org-todo-active)
-				 ("KILL" . +org-todo-cancel)))
+				 ("Kill" . "red")))
   ;;时间戳设置
   (setq org-time-stamp-formats '("<%Y-%m-%d %A>" . "<%Y-%m-%d %A %H:%M>"))
   ;; 启动时缩进
@@ -501,6 +557,7 @@ with `org-cycle')."
 		       ("convert -density %D -trim -antialias %F -quality 100 %O"))))
   (setq org-preview-latex-default-process 'xdvsvgm)
   (setq org-preview-latex-image-directory "~/org/ltximg/")
+  (require 'ox-latex)
   (add-to-list 'org-latex-classes
 	       '("ctexart" "\\documentclass[11pt]{ctexart}
 [NO-DEFAULT-PACKAGES]
@@ -521,6 +578,7 @@ with `org-cycle')."
 \\usepackage{amssymb}
 \\usepackage{booktabs}
 \\usepackage[colorlinks,linkcolor=black,anchorcolor=red,citecolor=black]{hyperref}
+\\usepackage[margin=1in]{geometry}
 \\tolerance=1000
 
 % 设置源码格式
@@ -531,22 +589,26 @@ with `org-cycle')."
 % 设置verbatim的字体大小
 \\makeatletter
 \\def\\verbatim{\\tiny\\@verbatim \\frenchspacing\\@vobeyspaces \\@xverbatim}
-\\makeatother"
+\\makeatother
+"
                  ("\\section{%s}" . "\\section*{%s}")
                  ("\\subsection{%s}" . "\\subsection*{%s}")
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                  ("\\paragraph{%s}" . "\\paragraph*{%s}")
                  ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-
   ;; 设置默认的class为ctexart
   (setq org-latex-default-class "ctexart")
   (setq org-latex-pdf-process
-      '(
-        "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-        "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-        "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-        "rm -fr %b.out %b.log %b.tex auto"
-        ))
+	'(
+          "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "rm -fr %b.out %b.log %b.tex auto"
+          ))
+  (use-package org-elp
+  :config
+  (setq org-elp-idle-time 0.5
+        org-elp-split-fraction 0.25))
   ;; (setq org-capture-templates
   ;;       '(("t" "TODO" entry (file+headline as/gtd "Collect")
   ;;       "* TODO %? %^G \n  %U" :empty-lines 1)
@@ -567,7 +629,6 @@ with `org-cycle')."
   )
 
 
-
 ;;; denote
 (use-package denote
   :bind
@@ -581,55 +642,30 @@ with `org-cycle')."
    )
   :config
   (setq denote-directory (expand-file-name "~/org/notes/")
-      denote-known-keywords '("read")
-      denote-infer-keywords t
-      denote-sort-keywords t
-      denote-allow-multi-word-keywords t
-      denote-date-prompt-use-org-read-date t
-      denote-link-fontify-backlinks t
-      denote-front-matter-date-format 'org-timestamp
-      denote-prompts '(title keywords))
+	denote-known-keywords '("read")
+	denote-infer-keywords t
+	denote-sort-keywords t
+	denote-allow-multi-word-keywords t
+	denote-date-prompt-use-org-read-date t
+	denote-link-fontify-backlinks t
+	denote-front-matter-date-format 'org-timestamp
+	denote-prompts '(title keywords))
   )
 
 
 
 ;;; aas
-(use-package aas
-  :hook
-  (LaTeX-mode . aas-activate-for-major-mode)
-  (org-mode . aas-activate-for-major-mode)
-  :config
-  (aas-set-snippets 'text-mode
-    ;; expand unconditionally
-    ";o-" "¨­"
-    ";i-" "¨©"
-    ";a-" "¨¡"
-    ";u-" "¨±"
-    ";e-" "¨¥")
-  (aas-set-snippets 'latex-mode
-    ;; set condition!
-    :cond #'texmathp			; expand only while in math
-    "supp" "\\supp"
-    "On" "O(n)"
-    "O1" "O(1)"
-    "Olog" "O(\\log n)"
-    "Olon" "O(n \\log n)"
-    ;; Use YAS/Tempel snippets with ease!
-    "amin" '(yas "\\argmin_{$1}")   ; YASnippet snippet shorthand form
-    "amax" '(tempel "\\argmax_{" p "}") ; Tempel snippet shorthand form
-    ;; bind to functions!
-    ";ig" #'insert-register
-    ";call-sin"
-    (lambda (angle)			; Get as fancy as you like
-      (interactive "sAngle: ")
-      (insert (format "%s" (sin (string-to-number angle))))))
-  ;; disable snippets by redefining them with a nil expansion
-  (aas-set-snippets 'latex-mode
-    "supp" nil))
+;; (use-package aas
+;;   :hook
+;;   (LaTeX-mode . aas-activate-for-major-mode)
+;;   (latex-mode . aas-activate-for-major-mode)
+;;   (org-mode . aas-activate-for-major-mode)
+;;   )
 
 
 ;;; laas
 (use-package laas
+  :ensure t
   :hook
   (LaTeX-mode . laas-mode)
   (org-mode . laas-mode)
@@ -637,11 +673,7 @@ with `org-cycle')."
   (aas-set-snippets 'laas-mode
     ;; set condition!
     :cond #'texmathp			; expand only while in math
-    "supp" "\\supp"
-    "On" "O(n)"
-    "O1" "O(1)"
-    "Olog" "O(\\log n)"
-    "Olon" "O(n \\log n)"
+    ;;"supp" "\\supp"
     ;; bind to functions!
     "Sum" (lambda () (interactive)
             (yas-expand-snippet "\\sum_{$1}^{$2} $0"))
@@ -926,7 +958,7 @@ with `org-cycle')."
  ;; If there is more than one, they won't work right.
  '(org-modules nil)
  '(package-selected-packages
-   '(denote elisp-demos fanyi org-download xenops laas aas auto-package-update vterm tree-sitter-langs "tree-sitter" tree-sitter with-proxy helpful rime rust-mode ftable company-statistics wanderlust valign powerline quelpa-use-package quelpa diminish doom-themes expand-region gnu-elpa-keyring-update doom-modeline magit use-package ivy company))
+   '(org-fragtog org-elp ox-latex denote elisp-demos fanyi org-download laas auto-package-update vterm tree-sitter-langs "tree-sitter" tree-sitter with-proxy helpful rime rust-mode ftable company-statistics wanderlust valign powerline quelpa-use-package quelpa diminish doom-themes expand-region gnu-elpa-keyring-update doom-modeline magit use-package ivy company))
  '(warning-suppress-log-types '(((defvaralias losing-value org-tab-first-hook)) (comp)))
  '(warning-suppress-types '((use-package) (use-package))))
 (custom-set-faces
