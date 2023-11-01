@@ -478,7 +478,7 @@ verbosely."
                    "中日韩字符：%d, 中英文总字数：%d")
 		 (car list)
 		 (+ (car list) (car (last list))))))))
-  (advice-add 'words-count-message-function :override #'+words-count--format-message)
+  (advice-add 'words-count--format-message :override #'+words-count--format-message)
   ;; 设置表格对齐
   ;; (use-package valign
   ;;  :config
