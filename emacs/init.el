@@ -130,16 +130,55 @@
 
 
 ;;; 输入法设置
-(use-package rime
-  :config
-  (setq default-input-method "rime")
-  (cond ((eq system-type 'windows-nt)
-	 (setq rime-share-data-dir "c:/msys64/mingw64/share/rime-data"))
-	((eq system-type 'gnu/linux)
-	 (setq rime-share-data-dir "/home/liuwei/.local/share/fcitx5/rime")
-	 ))
-  (setq rime-cursor "˰")
-  (set-face-attribute 'rime-preedit-face nil :background "black" :foreground "gray"))
+(when (string= "fcitx" (getenv "GTK_IM_MODULE"))
+  (use-package sis
+    :ensure t
+    ;; :hook
+    ;; enable the /context/ and /inline region/ mode for specific buffers
+    ;; (((text-mode prog-mode) . sis-context-mode)
+    ;;  ((text-mode prog-mode) . sis-inline-mode))
+
+    :config
+    ;; For MacOS
+    (sis-ism-lazyman-config
+
+     ;; English input source may be: "ABC", "US" or another one.
+     ;; "com.apple.keylayout.ABC"
+     "2"
+
+     ;; Other language input source: "rime", "sogou" or another one.
+     ;; "im.rime.inputmethod.Squirrel.Rime"
+     "1"
+     'fcitx5)
+
+    ;; enable the /cursor color/ mode
+    (sis-global-cursor-color-mode t)
+    ;; enable the /respect/ mode
+    (sis-global-respect-mode t)
+    ;; enable the /context/ mode for all buffers
+    (sis-global-context-mode t)
+    ;; enable the /inline english/ mode for all buffers
+    (sis-global-inline-mode t)
+    )
+  )
+(unless (string= "fcitx" (getenv "GTK_IM_MODULE"))
+  (use-package rime
+    :hook
+    (org-mode . +open-flypy)
+    :config
+    ;; 设置输入法
+    (defun +open-flypy ()
+      (interactive)
+      (set-input-method "rime"))
+    (setq default-input-method "rime")
+    (cond ((eq system-type 'windows-nt)
+	   (setq rime-share-data-dir "c:/msys64/mingw64/share/rime-data"))
+	  ((eq system-type 'gnu/linux)
+	   (setq rime-share-data-dir "/home/liuwei/.local/share/fcitx5/rime")
+	   ))
+    (setq rime-cursor "˰")
+    (set-face-attribute 'rime-preedit-face nil :background "black" :foreground "gray")))
+
 
 ;;; 外观设置
 ;; 关闭工具栏
@@ -396,10 +435,7 @@ with `org-cycle')."
             (setq org-cycle-subtree-status 'subtree))
           (org-cycle-internal-local)
           t)))))
-;; 设置输入法
-(defun +open-flypy ()
-  (interactive)
-  (set-input-method "rime"))
+
 
 
 ;;; xenops
@@ -420,7 +456,7 @@ with `org-cycle')."
 	      )
   :hook
   (
-   (org-mode . +open-flypy)
+   ;;(org-mode . +open-flypy)
    (org-mode . (lambda () (display-line-numbers-mode -1)))
    (org-mode . (lambda () (org-bullets-mode 1)))
    (org-mode . (lambda () (setq truncate-lines nil)))
@@ -462,7 +498,7 @@ verbosely."
 %s
 ========================================
 "
-	 "汉字（除空格）：%d, 汉字（带空格）：%d, 行数：%d, ANSCI：%d, %s")
+	 "字符（除空格）：%d, 字符（带空格）：%d, 行数：%d, ANSCI 词数：%d, %s")
        (cadr list)
        (- end start)
        (count-lines start end)
@@ -470,12 +506,12 @@ verbosely."
        (if (= 0 (car list))
            (format (if arg
                        " Latin Words ................... %d\n"
-                     "拉丁字母：%d")
+                     "拉丁字母词数：%d")
                    (count-words start end))
 	 (format (if arg
                      " CJK Chars ..................... %d
  Word Count .................... %d\n"
-                   "中日韩字符：%d, 中英文总字数：%d")
+                   "中文：%d, 中英文总字数：%d")
 		 (car list)
 		 (+ (car list) (car (last list))))))))
   (advice-add 'words-count--format-message :override #'+words-count--format-message)
@@ -958,7 +994,15 @@ verbosely."
  ;; If there is more than one, they won't work right.
  '(org-modules nil)
  '(package-selected-packages
-   '(org-fragtog org-elp ox-latex denote elisp-demos fanyi org-download laas auto-package-update vterm tree-sitter-langs "tree-sitter" tree-sitter with-proxy helpful rime rust-mode ftable company-statistics wanderlust valign powerline quelpa-use-package quelpa diminish doom-themes expand-region gnu-elpa-keyring-update doom-modeline magit use-package ivy company))
+   '(auto-package-update company company-statistics denote diminish
+			 doom-modeline doom-themes elisp-demos
+			 expand-region fanyi ftable
+			 gnu-elpa-keyring-update helpful ivy laas
+			 magit org-download org-elp org-fragtog
+			 ox-latex powerline quelpa quelpa-use-package
+			 rime rust-mode sis "tree-sitter" tree-sitter
+			 tree-sitter-langs use-package valign vterm
+			 wanderlust with-proxy))
  '(warning-suppress-log-types '(((defvaralias losing-value org-tab-first-hook)) (comp)))
  '(warning-suppress-types '((use-package) (use-package))))
 (custom-set-faces
