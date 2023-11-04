@@ -130,54 +130,58 @@
 
 
 ;;; 输入法设置
-(when (string= "fcitx" (getenv "GTK_IM_MODULE"))
-  (use-package sis
-    :ensure t
-    ;; :hook
-    ;; enable the /context/ and /inline region/ mode for specific buffers
-    ;; (((text-mode prog-mode) . sis-context-mode)
-    ;;  ((text-mode prog-mode) . sis-inline-mode))
+;; 由于 fcitx 的显示不是很好，所以暂时 emacs 中不使用系统输入法
+(setq pgtk-use-im-context-on-new-connection nil) 
+;; 设置输入法
+(defun +open-flypy ()
+  (interactive)
+  (set-input-method "rime"))
 
-    :config
-    ;; For MacOS
-    (sis-ism-lazyman-config
+;;; rime
+(use-package rime
+  :config    
+  (setq default-input-method "rime") 
+  (cond ((eq system-type 'windows-nt)
+	 (setq rime-share-data-dir "c:/msys64/mingw64/share/rime-data"))
+	((eq system-type 'gnu/linux)
+	 (setq rime-share-data-dir "/home/liuwei/.local/share/fcitx5/rime")
+	 (setq rime-user-data-dir "~/.config/fcitx5/rime")
+	 ))
+  
+  (setq rime-cursor "˰")
+  (set-face-attribute 'rime-preedit-face nil :background "black" :foreground "gray"))
+;; (when (string= "fcitx" (getenv "GTK_IM_MODULE"))
+;;   (use-package sis
+;;     :ensure t
+;;     ;; :hook
+;;     ;; enable the /context/ and /inline region/ mode for specific buffers
+;;     ;; (((text-mode prog-mode) . sis-context-mode)
+;;     ;;  ((text-mode prog-mode) . sis-inline-mode))
 
-     ;; English input source may be: "ABC", "US" or another one.
-     ;; "com.apple.keylayout.ABC"
-     "2"
+;;     :config
+;;     ;; For MacOS
+;;     (sis-ism-lazyman-config
 
-     ;; Other language input source: "rime", "sogou" or another one.
-     ;; "im.rime.inputmethod.Squirrel.Rime"
-     "1"
-     'fcitx5)
+;;      ;; English input source may be: "ABC", "US" or another one.
+;;      ;; "com.apple.keylayout.ABC"
+;;      "2"
 
-    ;; enable the /cursor color/ mode
-    (sis-global-cursor-color-mode t)
-    ;; enable the /respect/ mode
-    (sis-global-respect-mode t)
-    ;; enable the /context/ mode for all buffers
-    (sis-global-context-mode t)
-    ;; enable the /inline english/ mode for all buffers
-    (sis-global-inline-mode t)
-    )
-  )
-(unless (string= "fcitx" (getenv "GTK_IM_MODULE"))
-  (use-package rime
-    :hook
-    (org-mode . +open-flypy)
-    :config
-    ;; 设置输入法
-    (defun +open-flypy ()
-      (interactive)
-      (set-input-method "rime"))
-    (setq default-input-method "rime")
-    (cond ((eq system-type 'windows-nt)
-	   (setq rime-share-data-dir "c:/msys64/mingw64/share/rime-data"))
-	  ((eq system-type 'gnu/linux)
-	   (setq rime-share-data-dir "/home/liuwei/.local/share/fcitx5/rime")
-	   ))
-    (setq rime-cursor "˰")
-    (set-face-attribute 'rime-preedit-face nil :background "black" :foreground "gray")))
+;;      ;; Other language input source: "rime", "sogou" or another one.
+;;      ;; "im.rime.inputmethod.Squirrel.Rime"
+;;      "1"
+;;      'fcitx5)
+
+;;     ;; enable the /cursor color/ mode
+;;     (sis-global-cursor-color-mode t)
+;;     ;; enable the /respect/ mode
+;;     (sis-global-respect-mode t)
+;;     ;; enable the /context/ mode for all buffers
+;;     (sis-global-context-mode t)
+;;     ;; enable the /inline english/ mode for all buffers
+;;     (sis-global-inline-mode t)
+;;     )
+;;   )
+
 
 
 ;;; 外观设置
@@ -453,10 +457,14 @@ with `org-cycle')."
 	      ("C-<tab>" . "M-<tab>")
 	      ("C-c o" . counsel-outline)
 	      ("M-=" . advance-words-count)
+	 :map global-map
+	      ("C-c n c" . org-capture)
 	      )
+  
   :hook
   (
-   ;;(org-mode . +open-flypy)
+   (org-mode . (lambda () (unless buffer-read-only
+			    (set-input-method "rime"))))
    (org-mode . (lambda () (display-line-numbers-mode -1)))
    (org-mode . (lambda () (org-bullets-mode 1)))
    (org-mode . (lambda () (setq truncate-lines nil)))
@@ -544,11 +552,11 @@ verbosely."
   ;; TODO 结束时加上时间
   (setq org-log-done 'time)
   (setq org-directory "~/org/")
-  (setq org-agenda-files (cond ((eq system-type 'gnu/linux) '("~/org/agenda/"))
+  (setq org-agenda-files (cond ((eq system-type 'gnu/linux) '("~/org/agenda/agenda.org"))
 			       ((eq system-type 'windows-nt) '("d:/onedrive/OneDrive - cumt.edu.cn/org/agenda"))))
   (setq org-ellipsis "⤵")
   ;; 设置 ORG 标题范围，使上面的尾标可以正确显示
-  (setq org-cycle-separator-lines 1)
+  (setq org-cycle-separator-lines 2)
   ;; 设置 ORG 可以通过 <s TAB 插入模板
   ;;(add-to-list 'org-modules 'org-tempo t)
   ;; 加入bilibili视频，其中链接为Bv号
@@ -641,32 +649,85 @@ verbosely."
           "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
           "rm -fr %b.out %b.log %b.tex auto"
           ))
-  (use-package org-elp
-  :config
-  (setq org-elp-idle-time 0.5
-        org-elp-split-fraction 0.25))
-  ;; (setq org-capture-templates
-  ;;       '(("t" "TODO" entry (file+headline as/gtd "Collect")
-  ;;       "* TODO %? %^G \n  %U" :empty-lines 1)
-  ;;       ("s" "Scheduled TODO" entry (file+headline as/gtd "Collect")
-  ;;       "* TODO %? %^G \nSCHEDULED: %^t\n  %U" :empty-lines 1)
-  ;;       ("d" "Deadline" entry (file+headline as/gtd "Collect")
-  ;;           "* TODO %? %^G \n  DEADLINE: %^t" :empty-lines 1)
-  ;;       ("p" "Priority" entry (file+headline as/gtd "Collect")
-  ;;       "* TODO [#A] %? %^G \n  SCHEDULED: %^t")
-  ;;       ("a" "Appointment" entry (file+headline as/gtd "Collect")
-  ;;       "* %? %^G \n  %^t")
-  ;;       ("l" "Link" entry (file+headline as/gtd "Collect")
-  ;;       "* TODO %a %? %^G\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n")
-  ;;       ("n" "Note" entry (file+headline as/gtd "Notes")
-  ;;           "* %? %^G\n%U" :empty-lines 1)
-  ;;       ("j" "Journal" entry (file+datetree "/Users/andrew/org/agenda/journal.org")
-  ;;       "* %? %^G\nEntered on %U\n")))
-  )
+  ;;;公式预览，使用 xenops
+  ;; (use-package org-elp
+  ;; :config
+  ;; (setq org-elp-idle-time 0.5
+  ;;       org-elp-split-fraction 0.25))
+  (defun +capture-filename ()
+    (interactive)
+    (let* ((filename (read-from-minibuffer "文件名："))
+	   (cmd (concat "fd --search-path " denote-directory " " filename))
+	   (files (shell-command-to-string cmd)))
+      ;;搜索为空说明没有找到
+      (if (string-empty-p files)
+	  (let* ((title filename)
+		 (file-type 'org)
+		 (keyws (read-string "关键词："))
+		 (kws  (if (string-empty-p keyws)
+			   nil
+			 (split-string keyws ",")))
+		 (date (current-time))
+		 (id (format-time-string denote-id-format date))
+		 (directory (denote-directory))
+		 (template "")
+		 (signature "")
+		 (path (denote--path title kws directory id file-type signature))
+		 (header (denote--format-front-matter title
+						      (denote--date date file-type)
+						      kws
+						      (format-time-string denote-id-format date)
+						      file-type))
+		 (buffer (find-file path)))
+	    (denote-barf-duplicate-id id)
+	    (with-current-buffer buffer
+	      (insert header)
+	      (insert template)
+	      (save-buffer)
+	      (kill-buffer))
+	    path)
+	(progn
+	  (let* ((lines (split-string files "[\n]+"))
+		 (searched-file (ivy-read (format "choose the file[%s]: " default-directory) lines)))
+	    searched-file)))))
+  (defun +capture-title ()
+    (interactive)
+    ;;设置搜索的正则表达式
+    (let ((settings (cdr (assq major-mode counsel-outline-settings))))
+      (ivy-read "标题：" (counsel-outline-candidates settings)
+		:action #'(lambda (x)
+			    ;;如果搜到了，X 是 list，否则是字符串
+			    (if (not (stringp x))
+				(progn
+				  (goto-char (cdr x))
+				  (or (bolp)
+				      (insert "\n"))
+				  (org-end-of-subtree))
+			      (progn
+				;;移动到最后
+				(end-of-buffer)
+				(or (bolp)
+				    (insert "\n"))
+				(when (/= (point) (point-min))
+				  (org-end-of-subtree t t))
+				(insert  "* " x)
+				(org-end-of-subtree)))))))
+  (setq org-capture-templates
+        '(("t" "TODO" entry (file+headline org-agenda-files "Collect")
+           "* TODO %? %^G \n  %U" :empty-lines 1)
+          ("s" "Scheduled TODO" entry (file+headline "" "Collect")
+           "* TODO %? %^G \nSCHEDULED: %^t\n  %U" :empty-lines 1)
+          ("d" "Deadline" entry (file+headline "" "Collect")
+           "* TODO %? %^G \n  DEADLINE: %^t" :empty-lines 1)
+          ("n" "Note" plain (file+function +capture-filename +capture-title)
+           "%U\n%?" :empty-lines-after 1)
+          ("j" "Journal" entry (file+datetree "" "Journal")
+           "* %^{标题} %^G\nEntered on %U\n"))))
 
 
 ;;; denote
 (use-package denote
+  :after org
   :bind
   (("C-c n n" . denote)
    ("C-c n i" . denote-link-or-create)
@@ -888,15 +949,36 @@ verbosely."
 
 
 ;;; tree-sitter
-(use-package tree-sitter
-  :hook
-  (prog-mode . turn-on-tree-sitter-mode)
-  (tree-sitter-after-on . tree-sitter-hl-mode)
+;; 1. 编译emacs29.1  
+;; 2. 添加动态模块
+(add-to-list 'treesit-extra-load-path "~/.emacs.d/tree-sitter/tree-sitter-module")
+
+;; 3. melpa 下载 tree-auto
+(use-package treesit-auto
+  :ensure t
+  :hook (after-init . global-treesit-auto-mode)
   :config
-  (require tree-sitter-langs)
+  ;;(global-treesit-auto-mode)
+  ;;(add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+  (setq treesit-auto-install nil)
+  ;; 这句话最管用,一下子从白茫茫一片变好了.
+  (setq treesit-font-lock-level 4)
+  ;; 4. 添加模式链接
   (setq major-mode-remap-alist
-	'((c++-mode . c++-ts-mode)))
-  )
+	'((c-mode . c-ts-mode))))
+
+;; (use-package tree-sitter
+;;   :hook
+;;   (prog-mode . turn-on-tree-sitter-mode)
+;;   (tree-sitter-after-on . tree-sitter-hl-mode)
+;;   :config
+;;   (require tree-sitter-langs)
+;;   (setq major-mode-remap-alist
+;; 	'((c++-mode . c++-ts-mode)))
+;;   )
+
+
+
 
 
 ;;; fanyi
@@ -993,16 +1075,7 @@ verbosely."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(org-modules nil)
- '(package-selected-packages
-   '(auto-package-update company company-statistics denote diminish
-			 doom-modeline doom-themes elisp-demos
-			 expand-region fanyi ftable
-			 gnu-elpa-keyring-update helpful ivy laas
-			 magit org-download org-elp org-fragtog
-			 ox-latex powerline quelpa quelpa-use-package
-			 rime rust-mode sis "tree-sitter" tree-sitter
-			 tree-sitter-langs use-package valign vterm
-			 wanderlust with-proxy))
+ '(package-selected-packages nil)
  '(warning-suppress-log-types '(((defvaralias losing-value org-tab-first-hook)) (comp)))
  '(warning-suppress-types '((use-package) (use-package))))
 (custom-set-faces
