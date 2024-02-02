@@ -1,15 +1,16 @@
 ;;; init-org.el --- Initialize Org configurations.	-*- lexical-binding: t -*-
 
+(require 'init-utils)
 
 (use-package org
   :ensure nil
-  :defer t
   :bind (:map org-mode-map
 	      ("C-C a" . org-agenda)
 	      ("C-'" . nil)
 	      ("M-l" . org-metaright)
 	      ("M-h" . org-metaleft)
-	      ("C-c o" . counsel-outline)
+	      ("M-H" . org-shiftmetaleft)
+	      ("M-L" . org-shiftmetaright)
 	      ("M-=" . advance-words-count)
 	      :map global-map
 	      ("C-c n c" . org-capture)
@@ -17,10 +18,10 @@
   :hook
   ((org-mode . (lambda () (unless buffer-read-only
 			    (set-input-method "rime"))))
-   (org-mode . (lambda () (display-line-numbers-mode -1)))
-   (org-mode . (lambda () (org-bullets-mode 1)))
+   ;;(org-mode . (lambda () (display-line-numbers-mode -1)))
    (org-mode . (lambda () (setq truncate-lines nil)))  
    (org-mode . (lambda () (yas-activate-extra-mode 'latex-mode)))
+   (org-mode . (lambda () (display-line-numbers-mode -1)))
    ;; 设置 ORG 标题样式
    (org-cycle-tab-first . +org-cycle-only-current-subtree-h)
    )
@@ -63,6 +64,8 @@
   ;; TODO 设置
   (org-todo-keywords '((sequence "TODO(t)"
 				 "DOING(i!)"
+				 "[]([)"
+				 " (*)"
 				 "|"
 				 "DONE(d!)"
 				 "KILLED(k!)")))
@@ -106,9 +109,10 @@
   (org-latex-pdf-process
    '(
      "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+     "bibtex %b"
      "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
      "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-     "rm -fr %b.out %b.log %b.tex auto"
+     "rm -fr %b.bbl %b.out %b.log %b.tex auto"
      ))
   (org-preview-latex-default-process 'xdvsvgm)
   (org-preview-latex-image-directory "~/org/ltximg/")
@@ -147,11 +151,6 @@
   ;; 显示上下标
   ;;(org-toggle-pretty-entities)
   ;; 设置 TAB 键只有两层循环
-  ;; 设置 latex 图片缩放比例
-  (require 'ox-latex)
-  (plist-put org-format-latex-options :scale 1.5)
-  (plist-put org-format-latex-options :background "Transparent")
-  (plist-put org-format-latex-options :foreground 'default)
   (defun +org-cycle-only-current-subtree-h (&optional arg)
     "Toggle the local fold at the point (as opposed to cycling through all levels
 with `org-cycle')."
@@ -169,7 +168,17 @@ with `org-cycle')."
               (setq org-cycle-subtree-status 'subtree))
             (org-cycle-internal-local)
             t)))))
-  
+  (add-to-list 'org-file-apps '("\\.pdf\\'" . "okular"))
+  )
+
+(use-package ox-latex
+  :ensure nil
+  :after org
+  :config
+  ;; 设置 latex 图片缩放比例
+  (plist-put org-format-latex-options :scale 1.5)
+  (plist-put org-format-latex-options :background "Transparent")
+  (plist-put org-format-latex-options :foreground 'default)
   (add-to-list 'org-latex-classes
 	       '("ctexart" "\\documentclass[11pt]{ctexart}
 [NO-DEFAULT-PACKAGES]
@@ -208,7 +217,6 @@ with `org-cycle')."
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                  ("\\paragraph{%s}" . "\\paragraph*{%s}")
                  ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
-  
 
 
 ;;; org-agenda
@@ -292,29 +300,38 @@ with `org-cycle')."
 	  (let* ((lines (split-string files "[\n]+"))
 		 (searched-file (ivy-read (format "choose the file[%s]: " default-directory) lines)))
 	    searched-file)))))
-  
+
   (defun +capture-title ()
     (interactive)
-    ;;设置搜索的正则表达式
-    (let ((settings (cdr (assq major-mode counsel-outline-settings))))
-      (ivy-read "标题：" (counsel-outline-candidates settings)
-		:action #'(lambda (x)
-			    ;;如果搜到了，X 是 list，否则是字符串
-			    (if (listp x)  
-				(progn  
-				  (goto-char (cdr x))
-				  (or (bolp)
-				      (insert "\n"))
-				  (org-end-of-subtree))
-			      (progn
-				;;移动到最后
-				(end-of-buffer)
-				(or (bolp)
-				    (insert "\n"))
-				(when (/= (point) (point-min))
-				  (org-end-of-subtree t t))
-				(insert  "* " x "\n")
-				(org-end-of-subtree)))))))
+    (let ((candidates (consult--outline-candidates)))
+      (consult--read candidates
+		     :prompt "标题："
+		     :sort nil
+		     :require-match t
+		     :lookup #'consult--line-match
+		     )))
+  ;; (defun +capture-title ()
+  ;;   (interactive)
+  ;;   ;;设置搜索的正则表达式
+  ;;   (let ((settings (cdr (assq major-mode counsel-outline-settings))))
+  ;;     (ivy-read "标题：" (counsel-outline-candidates settings)
+  ;; 		:action #'(lambda (x)
+  ;; 			    ;;如果搜到了，X 是 list，否则是字符串
+  ;; 			    (if (listp x)  
+  ;; 				(progn  
+  ;; 				  (goto-char (cdr x))
+  ;; 				  (or (bolp)
+  ;; 				      (insert "\n"))
+  ;; 				  (org-end-of-subtree))
+  ;; 			      (progn
+  ;; 				;;移动到最后
+  ;; 				(end-of-buffer)
+  ;; 				(or (bolp)
+  ;; 				    (insert "\n"))
+  ;; 				(when (/= (point) (point-min))
+  ;; 				  (org-end-of-subtree t t))
+  ;; 				(insert  "* " x "\n")
+  ;; 				(org-end-of-subtree)))))))
   
   (defun +capture-set-id ()
     (let ((org-id-method 'uuid))
@@ -348,8 +365,8 @@ with `org-cycle')."
       "* TODO %? %^G \n  DEADLINE: %^t" :empty-lines 1)
      ("n" "Note" plain (file+function +capture-filename +capture-title)
       "** %^{标题} \n:PROPERTIES:\n:CREATED: %U\n:ID: %(+capture-set-id) \n:END: \n%?")
-     ("j" "Journal" entry (file+datetree "" "Journal")
-      "* %^{标题} %^G\nEntered on %U\n"))))
+     ("j" "Journal" entry (file+datetree "~/org/nichijou.org")
+      "* %^{标题} \nChanged at %U\n%?"))))
 
 
 
@@ -375,25 +392,18 @@ with `org-cycle')."
                         ("shell"  . sh)))
   (org-babel-load-languages '((C          . t)
                               (dot        . t)
-                              (emacs-lisp . t)
                               (eshell     . t)
-                              (python     . t)
-                              (shell      . t))))
+                              (emacs-lisp . t)
+                              (shell      . t)
+                              (python     . t))))
 
 
 ;;; 美化工具
-(use-package org-bullets)
-
-
-
-;;; org-ref
-(use-package org-ref
+(use-package org-bullets
   :ensure nil
-  :after org)
-(use-package ivy-bibtex
-  :ensure nil
-  :after ivy org-ref)
-
+  :after org
+  :hook
+  (org-mode . (lambda () (org-bullets-mode 1))))
 
 
 ;;; denote
@@ -421,7 +431,7 @@ with `org-cycle')."
 	denote-prompts '(title keywords)))
 
 
-
+;;; org-download
 (use-package org-download
   :ensure nil
   :after org
@@ -436,7 +446,169 @@ with `org-cycle')."
   (org-download-method 'attach)
   (org-download-screenshot-method "powershell.exe -Command \"(Get-Clipboard -Format image).Save('$(wslpath -w %s)')\""))
 
+
+
+;;; xenops
+(use-package xenops
+  :ensure nil
+  :after (:any org latex)
+  :hook
+  (org-mode . (lambda ()
+		(xenops-mode)
+		;; 不激活 keymap
+		(setq-local minor-mode-map-alist
+			    (assq-delete-all 'xenops-mode minor-mode-map-alist))))
+  (latex-mode . xenops-mode)
+  (Latex-mode . xenops-mode)
+  :custom
+  (xenops-font-height 5)
+  :config
+  (when (eq +system-type 'wsl)
+    (setq display-mm-dimensions-alist '(("wayland-0" . (286 . 179)))))
+  )
+;;(use-package org-fragtog)
+
+
+;;; laas
+(use-package laas
+  :ensure nil
+  :after (:any org latex)
+  :hook
+  (LaTeX-mode . laas-mode)
+  (org-mode . laas-mode)
+  )
+
+
+
+;;; org-citar
+(use-package citar
+  :ensure nil
+  :after (:any org latex)
+  :custom
+  (citar-bibliography '("~/org/bibliography/references.bib"))
+  (citar-notes-paths '("~/org/notes"))
+  (org-cite-global-bibliography citar-bibliography)
+  (org-cite-insert-processor 'citar)
+  (org-cite-follow-processor 'citar)
+  (org-cite-activate-processor 'citar)
+  (citar-library-paths '("~/org/bibtex-pdfs"))
+  (citar-at-point-function 'embark-act)
+  ;;(advice-add 'citar-file-open :override #'citar-file-open-external)
+  :hook
+  (LaTeX-mode . citar-capf-setup)
+  (org-mode . citar-capf-setup)
+  :bind
+  (:map org-mode-map
+	("C-c b" . #'org-cite-insert))
+  :config
+  (defun +okular-open-pdf (file)
+    (add-to-list 'display-buffer-alist '("*Async Shell Command*" display-buffer-no-window (nil)))
+    (pcase +system-type
+      ('wsl (async-shell-command (concat "wslview " file)))
+      ))
+  (add-to-list 'citar-file-open-functions '("pdf" . +okular-open-pdf)))
+
+(use-package citar-embark
+  :after citar embark
+  :no-require
+  :config
+  (citar-embark-mode)
+  )
+
+
+(use-package biblio
+  :ensure nil
+  :custom
+  (biblio-download-directory "~/org/bibtex-pdfs/")
+  )
+
+
+;; (use-package org-modern
+;;   :ensure nil
+;;   :after org
+;;   :hook
+;;   (org-mode . org-modern-mode)
+;;   (org-mode . (lambda ()
+;; 		(org-indent-mode -1)))
+;;   (org-modern-mode . (lambda ()
+;; 		       (global-display-line-numbers-mode -1)
+;; 		       (line-number-mode -1)
+;; 		       (display-line-numbers-mode -1))))
+
+
+
+;;; org-ref
+;; (use-package ivy-bibtex
+;;   :ensure nil
+;;   :after ivy org 
+;;   :config
+;;   (setq bibtex-completion-bibliography '("~/org/bibliography/references.bib"
+;; 					 "~/org/bibliography/archive.bib")
+;; 	bibtex-completion-library-path '("~/org/bibliography/bibtex-pdfs/")
+;; 	bibtex-completion-notes-path "~/org/bibliography/notes/"
+;; 	bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
+
+;; 	bibtex-completion-additional-search-fields '(keywords)
+;; 	bibtex-completion-display-formats
+;; 	'((article       . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${journal:40}")
+;; 	  (inbook        . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} Chapter ${chapter:32}")
+;; 	  (incollection  . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
+;; 	  (inproceedings . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
+;; 	  (t             . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*}"))
+;; 	bibtex-completion-pdf-open-function
+;; 	(lambda (fpath)
+;; 	  (call-process "open" nil 0 nil fpath)))
+;;   :bind
+;;   ("C-c n b" . org-ref-bibtex-new-entry/body))
+
+;; (use-package org-ref
+;;   :ensure nil
+;;   :after org
+;;   :init
+;;   (require 'bibtex)
+;;   (setq bibtex-autokey-year-length 4
+;; 	bibtex-autokey-name-year-separator "-"
+;; 	bibtex-autokey-year-title-separator "-"
+;; 	bibtex-autokey-titleword-separator "-"
+;; 	bibtex-autokey-titlewords 2
+;; 	bibtex-autokey-titlewords-stretch 1
+;; 	bibtex-autokey-titleword-length 5)
+;;   (require 'org-ref-ivy)
+;;   (require 'org-ref-arxiv)
+;;   (require 'org-ref-scopus)
+;;   (require 'org-ref-wos)
+;;   :bind
+;;   (
+;;    :map bibtex-mode-map
+;;    ("C-c b" . org-ref-bibtex-hydra/body)
+;;    :map org-mode-map
+;;    ("C-c ]" . org-ref-insert-link)
+;;    ("M-[" . org-ref-insert-link-hydra/body)
+;;    )
+;;   )
+
+;; (use-package org-ref-ivy
+;;   :ensure nil
+;;   :after org-ref
+;;   :init
+;;   (setq org-ref-insert-link-function 'org-ref-insert-link-hydra/body
+;; 	org-ref-insert-cite-function 'org-ref-cite-insert-ivy
+;; 	org-ref-insert-label-function 'org-ref-insert-label-link
+;; 	org-ref-insert-ref-function 'org-ref-insert-ref-link
+;; 	org-ref-cite-onclick-function (lambda (_) (org-ref-citation-hydra/body))))
+
+
+
+
+
+
+
 ;; 设置表格对齐
+;; (use-package org-faces
+;;   :config (when (display-graphic-p)
+;; 	    (set-face-attribute 'org-table nil :family "" :height 100 :weight 'normal)
+;;             ;;(set-face-attribute 'org-table nil :family "Sarasa Mono SC")
+;; 	    ))
 ;; (use-package valign
 ;;   :ensure nil
 ;;   :after (:any org markdown)
@@ -447,31 +619,6 @@ with `org-cycle')."
 ;;   :ensure nil
 ;;   :after valign)
 
-
-;; xenops
-(use-package xenops
-  :ensure nil
-  :after (:any org latex)
-  :hook
-  (org-mode . xenops-mode)
-  :custom
-  (xenops-font-height 5)
-  :config
-  (when (eq +system-type 'wsl)
-    (setq display-mm-dimensions-alist '(("wayland-0" . (286 . 179)))))
-  )
-;;(use-package org-fragtog)
-
-
-
-;; laas
-(use-package laas
-  :ensure nil
-  :after (:any org latex)
-  :hook
-  (LaTeX-mode . laas-mode)
-  (org-mode . laas-mode)
-  )
 
 
 ;;; org-download
@@ -489,6 +636,11 @@ with `org-cycle')."
 ;;     (insert (concat "[[file:" file-path-wsl "]]"))
 ;;     (message "insert DONE.")
 ;;     ))
+
+;; markdown-mode
+(use-package markdown-mode
+  :ensure nil)
+
 
 (provide 'init-org)
 ;;; init-org.el ends here

@@ -77,6 +77,8 @@
 (setq select-enable-primary t
       select-enable-clipboard t)
 ;; 设置 wsl 下的复制粘贴
+;; (when (eq +system-type 'wsl)
+;;   (set-clipboard-coding-system 'gbk-dos))
 (when ;;(and (getenv "WAYLAND_DISPLAY") (not (equal (getenv "GDK_BACKEND") "x11")))
     (eq +system-type 'wsl)
   (unless (executable-find "wl-copy")
@@ -96,8 +98,8 @@
     (if (and wl-copy-process (process-live-p wl-copy-process))
 	nil	  ; should return nil if we're the current paste owner
       (shell-command-to-string "wl-paste -n | tr -d \r")))
-  (setq interprogram-cut-function 'wl-copy)
-  (setq interprogram-paste-function 'wl-paste))
+  (setq interprogram-cut-function #'wl-copy)
+  (setq interprogram-paste-function #'wl-paste))
 
 ;; No gc for font caches
 (setq inhibit-compacting-font-caches t)
@@ -115,100 +117,56 @@
 ;; 打开 BUFFER 时不显示空格开头的 BUFFER
 (setq buffer-invisibility-spec nil)
 
-;; 启动时关闭系统输入法
-(when (eq system-type 'windows-nt)
-  (add-hook 'after-init-hook
-	    (lambda ()
-	      (when (w32-get-ime-open-status)
-		(w32-set-ime-open-status nil))))
-  (defun +open-ime ()
-    (interactive)
-    (unless (w32-get-ime-open-status)
-      (w32-set-ime-open-status t)))
-  (defun +close-ime ()
-    (interactive)
-    (when (w32-get-ime-open-status)
-      (w32-set-ime-open-status nil)))
-  (defun +toggle-ime ()
-    (interactive)
-    (if (w32-get-ime-open-status)
-	(w32-set-ime-open-status nil)
-      (w32-set-ime-open-status t))))
-(when (eq system-type 'gnu/linux)
-  ;; 由于 fcitx 的显示不是很好，所以暂时在 wsl 中 emacs 中不使用系统输入法
-  (setq pgtk-use-im-context-on-new-connection nil))
-;; rime 输入法
-(use-package rime
-  :ensure t
-  :custom
-  (default-input-method "rime")
-  (rime-cursor "˰")
+(use-package isearch
+  :ensure nil
   :config
-  (defun +open-flypy ()
-    (interactive)
-    (set-input-method "rime"))
-  (cond ((eq system-type 'windows-nt)
-	 (setq rime-share-data-dir "c:/msys64/mingw64/share/rime-data"))
-	((eq system-type 'gnu/linux)
-	 (setq rime-share-data-dir "/home/liuwei/.local/share/fcitx5/rime")
-	 (setq rime-user-data-dir "~/.config/fcitx5/rime")
-	 ))  
-  (set-face-attribute 'rime-preedit-face nil :background "black" :foreground "gray"))
-
-
-;; ivy
-(use-package ivy
-  :ensure t
-  :diminish ivy-mode
-  :hook
-  (after-init . ivy-mode)
-  :custom
-  (ivy-count-format "%d/%d ")
-  (ivy-display-style 'fancy)
-  (ivy-initial-inputs-alist nil)
-  (ivy-wrap t)
-  (ivy-use-virtual-buffers t)
-  :config
-  (add-to-list 'ivy-ignore-buffers "\\*[[:ascii:]]+\\*")
+  ;; 这样可以在literal的isearch中，把空格直接当成正则里面的.*匹
+  (setq isearch-lax-whitespace t)
+  (setq search-whitespace-regexp ".*")
+  ;; 在搜正则时不开启这个功能，空格就是空格
+  (setq isearch-regexp-lax-whitespace nil)
+  ;; 搜到尾然后从头开始
+  (defun isearch-no-fail ()
+    (unless isearch-success
+      ;;(ad-disable-advice 'isearch-search 'after 'isearch-no-fail)
+      ;;(ad-activate 'isearch-search)
+      (isearch-repeat (if isearch-forward 'forward))
+      ;;(ad-enable-advice 'isearch-search 'after 'isearch-no-fail)
+      ;;(ad-activate 'isearch-search)
+      ))
+  (advice-add 'isearch-search :after #'isearch-no-fail)
   :bind
-  (("C-c C-r" . ivy-resume)))
-;; counsel
-(use-package counsel
- :ensure t
- :after ivy
- :hook
- (after-init . counsel-mode)
- :bind
- (("M-x" . counsel-M-x)
-  ("C-x b" . counsel-switch-buffer)
-  ("C-x C-b" . counsel-switch-buffer)
-  ("C-x C-f" . counsel-find-file)
-  ("C-x C-r" . counsel-recentf)
-  ;;("C-h f" . counsel-describe-function)
-  ;;("C-h v" . counsel-describe-variable)
-  ))
-;; swiper
-(use-package swiper
- :ensure t
- :bind
- (("C-s" . swiper-isearch)
-  ))
+  (:map isearch-mode-map
+	("DEL" . isearch-del-char)))
+  
 
 
-;; server
+ 
+
+;;; server
 (use-package server
   :ensure t
-  :config
-  (if (not (server-running-p))
-      (server-start))
   :hook
   (server-switch . (lambda ()
 		     (select-frame-set-input-focus (selected-frame))))
   (server-switch . raise-frame)
-  )
+  (server-after-make-frame . (lambda ()
+			       ;; 全屏
+			       (let ((fullscreen (frame-parameter nil 'fullscreen)))
+				 (unless (eq fullscreen 'maximized)
+				   (set-frame-parameter nil 'fullscreen 'maximized))				 
+				 )
+			       (+init-font)
+			       (when (fboundp 'set-scroll-bar-mode)
+				 ;; 关闭鼠标滚动标志
+				 (set-scroll-bar-mode nil))
+			       ))
+  :config
+  (if (not (server-running-p))
+      (server-start)))
 
 
-;; Type text
+;;; Type text
 (use-package text-mode
   :ensure nil
   :custom
@@ -234,11 +192,13 @@
 ;; transparent remote access
 (use-package tramp
   :ensure nil
-  :defer t
   :custom
   ;; Always use file cache when using tramp
   (remote-file-name-inhibit-cache nil)
-  (tramp-default-method "ssh"))
+  (tramp-default-method "ssh")
+  :config
+  (setq tramp-verbose 10)
+  (add-to-list 'tramp-remote-path "/home/lhaaso/wliu/.local/bin"))
 
 
 ;;; company-mode
@@ -256,6 +216,12 @@
   (company-minimum-prefix-length 2)
   (company-capf--sorted t)
   )
+(use-package company-prescient
+  :ensure t
+  :hook
+  (company-mode . company-prescient-mode))
+
+
 (use-package company-statistics
   :ensure t
   :after company
@@ -264,9 +230,9 @@
 
 
 ;; Press C-c s to search
-(use-package rg
-  :ensure t
-  :hook (after-init . rg-enable-default-bindings))
+;; (use-package rg
+;;   :ensure nil
+;;   :hook (after-init . rg-enable-default-bindings))
 
 
 ;; Translator for Emacs
@@ -278,7 +244,7 @@
 
 ;; which-key
 (use-package which-key
-  :ensure nil
+  :ensure t
   :config (which-key-mode))
 
 
@@ -295,22 +261,21 @@
   (avy-timeout-seconds 0.3)) ; 「关键字输入完毕」信号的触发时间
 
 
-;; 彩虹括号
-(use-package rainbow-delimiters
-  :ensure nil
-  :hook
-  (lisp-mode . rainbow-delimiters-mode)
-  (emacs-lisp-mode . rainbow-delimiters-mode))
+
 
 
 ;; paredit
 (use-package paredit
-  :ensure nil
+  :ensure t
+  :defer t
   :hook
   (emacs-lisp-mode . paredit-mode)
   (lisp-mode-hook . paredit-mode)
   (sly-mrepl-mode-hook . paredit-mode)
   ;;(add-hook 'rust-mode-hook 'paredit-mode)
+  :bind
+  (:map paredit-mode-map
+	("M-s" . nil))
   )
 
 
@@ -318,34 +283,13 @@
 (use-package expand-region
   :ensure t
   :bind (("C-=" . er/expand-region)
-	 ("C--" . er/contract-region)))
+ 	 ("C--" . er/contract-region)))
 
 
 ;;; magit
 (use-package magit
-  :defer t
-  :ensure nil)
-
-
-;; helpful
-(use-package helpful
   :ensure nil
-  :custom
-  (counsel-describe-function-function #'helpful-callable)
-  (counsel-describe-variable-function #'helpful-variable)
-  :bind
-  ([remap describe-function] . counsel-describe-function)
-  ([remap describe-command] . helpful-command)
-  ([remap describe-variable] . counsel-describe-variable)
-  ([remap describe-key] . helpful-key))
-
-
-;; elisp-demos
-(use-package elisp-demos
-  :ensure nil
-  :config
-  (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update)
-  )
+  :defer t)
 
 
 ;; eshell
@@ -364,44 +308,6 @@
   (vterm-mode . (lambda () (global-hl-line-mode -1))))
 
 
-;;; dirvish
-(use-package dirvish
-  :ensure nil
-  :defer t
-  :init
-  (dirvish-override-dired-mode)
-  :config
-  (setq dired-mouse-drag-files t)   
-  (setq dirvish-mode-line-format
-        '(:left (sort symlink) :right (omit yank index)))
-  (setq dirvish-attributes
-        '(all-the-icons file-time file-size collapse subtree-state vc-state git-msg))
-  (setq delete-by-moving-to-trash t)
-  (setq dired-listing-switches
-        "-l --almost-all --human-readable --group-directories-first --no-group")
-  :bind	     ; Bind `dirvish|dirvish-side|dirvish-dwim' as you see fit
-  (("C-c f" . dirvish-fd)
-   :map dirvish-mode-map	   ; Dirvish inherits `dired-mode-map'
-   ("a"   . dirvish-quick-access)
-   ("f"   . dirvish-file-info-menu)
-   ("y"   . dirvish-yank-menu)
-   ("N"   . dirvish-narrow)
-   ("^"   . dirvish-history-last)
-   ("h"   . dirvish-history-jump)	; remapped `describe-mode'
-   ("s"   . dirvish-quicksort)	; remapped `dired-sort-toggle-or-edit'
-   ("v"   . dirvish-vc-menu)	; remapped `dired-view-file'
-   ("TAB" . dirvish-subtree-toggle)
-   ("M-f" . dirvish-history-go-forward)
-   ("M-b" . dirvish-history-go-backward)
-   ("M-l" . dirvish-ls-switches-menu)
-   ("M-m" . dirvish-mark-menu)
-   ("M-t" . dirvish-layout-toggle)
-   ("M-s" . dirvish-setup-menu)
-   ("M-e" . dirvish-emerge-menu)
-   ("M-j" . dirvish-fd-jump)))
-
-
-
 ;;; hledger-mode
 (use-package hledger-mode
   :ensure nil
@@ -409,6 +315,8 @@
   :pin manual
   :mode ("\\.journal\\'" "\\.hledger\\'")
   :commands hledger-enable-reporting
+  :custom
+  (hledger-currency-string  "¥")
   :preface
   (defun hledger/next-entry ()
     "Move to next entry and pulse."
@@ -469,7 +377,15 @@
   (add-hook 'hledger-mode-hook
             (lambda ()
               (make-local-variable 'company-backends)
-              (add-to-list 'company-backends 'hledger-company))))
+              (add-to-list 'company-backends 'hledger-company)))
+  (add-hook 'hledger-mode-hook
+	    (lambda ()
+	      (setq-local tab-width 4)
+	      (setq-local indent-tabs-mode nil)))
+  (defun +hledger-insert-date--advice ()
+    (insert (org-read-date) " "))
+  (advice-add 'hledger-insert-date :override #'+hledger-insert-date--advice))
+
 
 (use-package hledger-input
   :ensure nil
@@ -500,6 +416,7 @@
 ;;; yasnippet
 (use-package yasnippet
   :ensure t
+  :defer t
   :diminish yas-minor-mode
   :bind
   (:map yas-minor-mode-map
@@ -514,28 +431,30 @@
   :config
   (yas-global-mode)
   )
-
 (use-package yasnippet-snippets
- :after (yasnippet)
- :config
- (defvar company-mode/enable-yas t
-   "Enable yasnippet for all backands")
+  :ensure t 
+  :after (:all company yasnippet)
+  ;; :config
+  ;; (defvar company-mode/enable-yas t
+  ;;   "Enable yasnippet for all backands")
 
- (defun company-mode/backend-with-yas (backend)
-   (if (or (not company-mode/enable-yas)
-	    (and (listp backend)
-		 (member 'company-yasnippet backend)))
-	backend
-     (append (if (consp backend) backend (list backend))
-	      '(:with company-yasnippet))))
+  ;; (defun company-mode/backend-with-yas (backend)
+  ;;   (if (or (not company-mode/enable-yas)
+  ;; 	    (and (listp backend)
+  ;; 		 (member 'company-yasnippet backend)))
+  ;; 	backend
+  ;;     (append (if (consp backend) backend (list backend))
+  ;; 	      '(:with company-yasnippet))))
 
- (setq company-backends
-	(mapcar #'company-mode/backend-with-yas  company-backends)))
+  ;; (setq company-backends
+  ;; 	(mapcar #'company-mode/backend-with-yas  company-backends))
+  )
 
 (use-package ivy-yasnippet
- :after ivy yasnippet
- :bind
- ("C-<tab>" . ivy-yasnippet))
+  :ensure t
+  :after ivy yasnippet
+  :bind
+  ("C-<tab>" . ivy-yasnippet))
 
 
 

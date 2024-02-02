@@ -24,7 +24,7 @@
 			 ;;("gnu-devel" . "https://elpa.gnu.org/devel/")
 			 ))
 ;; 初始化包
-;;(setq package-check-signature nil)
+(setq package-check-signature nil)
 ;;(package-initialize)
 
 ;;; use-package 加载
@@ -67,9 +67,11 @@
 
 
 (require 'init-utils)
-(require 'init-base)
 ;; 外观设置
 (require 'init-ui)
+;; 补全
+(require 'init-minibuffer)
+(require 'init-base)
 (require 'init-lang)
 ;; org-mode
 (require 'init-org)
@@ -78,11 +80,6 @@
 
 
 ;;; 自定义函数
-;;  快速打开配置
-(defun open-init-file ()
-  "快速打开配置文件"
-  (interactive)
-  (find-file "c:/Users/qinmo/.emacs.d/init.el"))
 
 
 ;;; 自定义快捷键
@@ -127,14 +124,14 @@
  ;; If there is more than one, they won't work right.
  '(company-show-quick-access 9 nil nil "Customized with use-package company")
  '(package-selected-packages
-   '(all-the-icons amx company-statistics counsel denote dirvish
-		   doom-modeline doom-themes elisp-demos expand-region
-		   fanyi ftable helpful hledger-mode ivy-bibtex
-		   ivy-yasnippet laas magit org-bullets org-download
-		   org-ref paredit puni quelpa-use-package
-		   rainbow-delimiters rg rime rust-mode simple
-		   solarized-theme treesit-auto valign vterm which-key
-		   xenops yasnippet-snippets)))
+   '(all-the-icons company-statistics consult counsel denote dirvish
+		   doom-modeline doom-themes elisp-demos embark
+		   embark-consult expand-region fanyi helpful
+		   hledger-mode ivy-avy ivy-bibtex ivy-yasnippet laas
+		   magit marginalia markdown-mode orderless
+		   org-download org-ref paredit quelpa-use-package
+		   rainbow-delimiters rime treesit-auto vertico vterm
+		   wgrep which-key xenops yasnippet-snippets)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

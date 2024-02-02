@@ -32,7 +32,8 @@
 
 ;;; eglot
 (use-package eglot
-  :ensure nil
+  :ensure t
+  :defer t
   :hook
   (c-mode . eglot-ensure)
   (c++-mode . eglot-ensure)
@@ -40,26 +41,30 @@
   :config
   (add-to-list 'eglot-server-programs '((c++-mode c++-ts-mode c-mode) "clangd")))
 (use-package eldoc
-  :ensure nil)
+  :defer t
+  :ensure t)
 
 
 ;;; tree-sitter
 ;; 1. 编译emacs29.1  
 ;; 2. 添加动态模块
-(add-to-list 'treesit-extra-load-path "~/.emacs.d/tree-sitter/tree-sitter-module")
-;; 3. melpa 下载 tree-auto
+(add-to-list 'treesit-extra-load-path "~/.config/emacs/tree-sitter/")
+;;3. melpa 下载 tree-auto
 (use-package treesit-auto
- :ensure t
- :hook (after-init . global-treesit-auto-mode)
- :config
- ;;(global-treesit-auto-mode)
- ;;(add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
- (setq treesit-auto-install nil)
- ;; 这句话最管用,一下子从白茫茫一片变好了.
- (setq treesit-font-lock-level 4)
- ;; 4. 添加模式链接
- (setq major-mode-remap-alist
-	'((c-mode . c-ts-mode))))
+  :ensure t
+  :config
+  (global-treesit-auto-mode)
+  (setq treesit-auto-install nil)
+  ;; 这句话最管用,一下子从白茫茫一片变好了.
+  (setq treesit-font-lock-level 4)
+  ;; 4. 添加模式链接
+  ;; (setq major-mode-remap-alist
+  ;; 	'((c-mode . c-ts-mode)
+  ;; 	  (python-mode . python-ts-mode)
+  ;; 	  (c++-mode . c++-ts-mode)))
+  ;; (setq treesit-load-name-override-list
+  ;; 	'((c++ "libtree-sitter-cpp" "tree_sitter_cpp")))
+  )
 
 
 (provide 'init-lang)
