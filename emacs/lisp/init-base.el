@@ -196,9 +196,10 @@
   ;; Always use file cache when using tramp
   (remote-file-name-inhibit-cache nil)
   (tramp-default-method "ssh")
-  :config
-  (setq tramp-verbose 10)
-  (add-to-list 'tramp-remote-path "/home/lhaaso/wliu/.local/bin"))
+  ;:config
+  ;;(setq tramp-verbose 10)
+  ;;(add-to-list 'tramp-remote-path "/home/lhaaso/wliu/.local/bin")
+  )
 
 
 ;;; company-mode

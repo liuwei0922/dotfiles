@@ -64,8 +64,6 @@
   ;; TODO 设置
   (org-todo-keywords '((sequence "TODO(t)"
 				 "DOING(i!)"
-				 "[]([)"
-				 " (*)"
 				 "|"
 				 "DONE(d!)"
 				 "KILLED(k!)")))
@@ -103,7 +101,8 @@
                            ("LWN"    . "https://lwn.net/Articles/")
                            ("WG21"   . "https://wg21.link/")
 			   ("bilibili" . "https://www.bilibili.com/video/%s")
-			   ("mengbai" . "https://mzh.moegirl.org.cn/zh-hans/%s")))
+			   ("mengbai" . "https://mzh.moegirl.org.cn/zh-hans/%s")
+			   ("handian" . "https://www.zdic.net/hans/%s")))
   ;; 设置默认的class为ctexart
   (org-latex-default-class "ctexart")
   (org-latex-pdf-process
@@ -453,11 +452,14 @@ with `org-cycle')."
   :ensure nil
   :after (:any org latex)
   :hook
-  (org-mode . (lambda ()
-		(xenops-mode)
-		;; 不激活 keymap
-		(setq-local minor-mode-map-alist
-			    (assq-delete-all 'xenops-mode minor-mode-map-alist))))
+  ;; (org-mode . (lambda ()
+  ;; 		(unless (and (boundp 'org-capture-mode)
+  ;; 			     org-capture-mode)
+  ;; 		  (xenops-mode)
+  ;; 		  ;; 不激活 keymap
+  ;; 		  (setq-local minor-mode-map-alist
+  ;; 			      (assq-delete-all 'xenops-mode minor-mode-map-alist))
+  ;; 		  )))
   (latex-mode . xenops-mode)
   (Latex-mode . xenops-mode)
   :custom
