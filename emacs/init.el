@@ -14,15 +14,18 @@
 
 ;;; 加载包设置
 (require 'package)
-(setq package-archives '(;;("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-			 ("gnu" . "http://1.15.88.122/gnu/")
-                         ;;("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-			 ("melpa-stable" . "http://1.15.88.122/stable-melpa/")
-			 ("melpa" . "http://1.15.88.122/melpa/")
-			 ("nongnu" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/nongnu/")
-			 ("gnu-stable" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/stable-melpa/")
-			 ;;("gnu-devel" . "https://elpa.gnu.org/devel/")
-			 ))
+;; (setq package-archives '(;;("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+;; 			 ("gnu" . "http://1.15.88.122/gnu/")
+;;                          ;;("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
+;; 			 ("melpa-stable" . "http://1.15.88.122/stable-melpa/")
+;; 			 ("melpa" . "http://1.15.88.122/melpa/")
+;; 			 ("nongnu" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/nongnu/")
+;; 			 ("gnu-stable" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/stable-melpa/")
+;; 			 ;;("gnu-devel" . "https://elpa.gnu.org/devel/")
+;; 			 ))
+(setq package-archives '(("gnu"    . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+                         ("nongnu" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/nongnu/")
+                         ("melpa"  . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
 ;; 初始化包
 (setq package-check-signature nil)
 ;;(package-initialize)
@@ -76,14 +79,16 @@
 ;; org-mode
 (require 'init-org)
 ;; count-words
-(require 'init-words)
+;;(require 'init-words)
 
 
 ;;; 自定义函数
 
 
 ;;; 自定义快捷键
-(global-set-key (kbd "C-;") #'set-mark-command) 
+(global-set-key (if (display-graphic-p)
+		    (kbd "C-;")
+		  (kbd "M-;")) #'set-mark-command) 
 ;; 设置 SHIFT 中英转换
 (global-set-key (kbd "M-\\") #'toggle-input-method)
 ;; 设置 HELP-MODE 中的快捷键
@@ -124,14 +129,7 @@
  ;; If there is more than one, they won't work right.
  '(company-show-quick-access 9 nil nil "Customized with use-package company")
  '(package-selected-packages
-   '(all-the-icons company-statistics consult counsel denote dirvish
-		   doom-modeline doom-themes elisp-demos embark
-		   embark-consult expand-region fanyi helpful
-		   hledger-mode ivy-avy ivy-bibtex ivy-yasnippet laas
-		   magit marginalia markdown-mode orderless
-		   org-download org-ref paredit quelpa-use-package
-		   rainbow-delimiters rime treesit-auto vertico vterm
-		   wgrep which-key xenops yasnippet-snippets)))
+   '(exec-path-from-shell vterm ebib cmake-mode nerd-icons org-download xenops denote citar-embark citar org-bullets markdown-mode biblio hledger-mode magit all-the-icons dirvish doom-modeline doom-themes elisp-demos embark-consult helpful marginalia orderless quelpa-use-package rainbow-delimiters rime vertico)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

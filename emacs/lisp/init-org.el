@@ -2,8 +2,20 @@
 
 (require 'init-utils)
 
-(use-package org
-  :ensure nil
+(when (daemonp)
+  )
+
+(defmacro use-package! (package &rest body)
+  `(if (daemonp)
+       (use-package ,package
+	 :ensure t
+	 ,@body)
+     (use-package ,package
+       :ensure nil
+       :defer t
+       ,@body)))
+
+(use-package! org
   :bind (:map org-mode-map
 	      ("C-C a" . org-agenda)
 	      ("C-'" . nil)
@@ -250,9 +262,66 @@ with `org-cycle')."
 		(org-agenda-show-all-dates nil)
 		)))
       ((+org-agenda-set-level (string-to-number (read-string "level:")))))))
+  (org-agenda-current-time-string "现在 - - - - - - - - - - - - -")
+  (org-agenda-scheduled-leaders '("预 " "应%02d天前开始 "))
+  (org-agenda-deadline-leaders '("止 " "过%02d天后到期 " "已经过期%02d天 "))
+  (org-agenda-format-date #'+org-agenda-format-date-aligned)
   :config
+  (defun +org-agenda-format-date-aligned (date)
+    "Format a DATE string for display in the daily/weekly agenda.
+This function makes sure that dates are aligned for easy reading."
+    (require 'cal-iso)
+    (let* ((dayname (calendar-day-name date))
+	   (day (cadr date))
+	   (day-of-week (calendar-day-of-week date))
+	   (month (car date))
+	   (monthname (calendar-month-name month))
+	   (year (nth 2 date))
+	   (iso-week (org-days-to-iso-week
+		      (calendar-absolute-from-gregorian date)))
+	   ;; (weekyear (cond ((and (= month 1) (>= iso-week 52))
+	   ;;        	  (1- year))
+	   ;;        	 ((and (= month 12) (<= iso-week 1))
+	   ;;        	  (1+ year))
+	   ;;        	 (t year)))
+	   (weekstring (if (= day-of-week 1)
+			   (format " W%02d" iso-week)
+			 "")))
+      (format "%4d年 - %s - %2d日 %-10s"
+	      year monthname day dayname)))
   (defvar +org-agenda-set-level 2 "回顾时用到的层级数"))
 
+
+(use-package parse-time
+  :after org-agenda
+  :ensure nil
+  :config
+  (setq parse-time-months
+        (append '(("yiyue" . 1) ("eryue" . 2) ("sanyue" . 3)
+                  ("siyue" . 4) ("wuyue" . 5) ("liuyue" . 6)
+                  ("qiyue" . 7) ("bayue" . 8) ("jiuyue" . 9)
+                  ("shiyue" . 10) ("shiyiyue" . 11) ("shieryue" . 12))
+                parse-time-months))
+  (setq parse-time-weekdays
+        (append '(("zri" . 0) ("zqi" . 0)
+                  ("zyi" . 1) ("zer" . 2) ("zsan" . 3)
+                  ("zsi" . 4) ("zwu" . 5) ("zliu" . 6)
+                  ("zr" . 0) ("zq" . 0)
+                  ("zy" . 1) ("ze" . 2) ("zs" . 3)
+                  ("zsi" . 4) ("zw" . 5) ("zl" . 6))
+                parse-time-weekdays)))
+
+(use-package calendar
+  :after (:or org-agenda hledger-mode)
+  :ensure nil
+  :config
+  (setq calendar-week-start-day 1)
+  (setq calendar-month-name-array
+	["一月" "二月" "三月" "四月" "五月" "六月"
+         "七月" "八月" "九月" "十月" "十一月" "十二月"])
+  (setq calendar-day-name-array
+        ["星期天" "星期一" "星期二" "星期三" "星期四" "星期五" "星期六"])
+  )
 
 ;;; org-capture 
 (use-package org-capture
@@ -437,13 +506,24 @@ with `org-cycle')."
   :hook
   ((org-mode dired-mode) . org-download-enable)
   :config
-  (defun +org-download-method (link)
-    (org-download--fullname (org-link-unescape link)))
-  :custom
-  (org-download-method #'+org-download-method)
-  (org-download-annotate-function (lambda (_link) ""))
-  (org-download-method 'attach)
-  (org-download-screenshot-method "powershell.exe -Command \"(Get-Clipboard -Format image).Save('$(wslpath -w %s)')\""))
+  (when (eq +system-type 'wsl)
+    (defun org-download-clipboard (&optional basename)
+	  "Capture the image from the clipboard and insert the resulting file."
+	  (interactive)
+	  (let ((org-download-screenshot-method
+		 (if (executable-find "wl-paste")
+		     "wl-paste -t image/bmp | convert bmp:- %s"
+		   (user-error
+		    "Please install the \"wl-paste\" program included in wl-clipboard"))))
+	    (org-download-screenshot basename))))
+  ;; (defun +org-download-method (link)
+  ;;   (org-download--fullname (org-link-unescape link)))
+  ;; :custom
+  ;; (org-download-method #'+org-download-method)
+  ;; (org-download-annotate-function (lambda (_link) ""))
+  ;; (org-download-method 'attach)
+  ;; (org-download-screenshot-method "powershell.exe -Command \"(Get-Clipboard -Format image).Save('$(wslpath -w %s)')\"")
+  )
 
 
 
@@ -466,19 +546,20 @@ with `org-cycle')."
   (xenops-font-height 5)
   :config
   (when (eq +system-type 'wsl)
-    (setq display-mm-dimensions-alist '(("wayland-0" . (286 . 179)))))
+    (setq display-mm-dimensions-alist '(("wayland-0" . (286 . 179))))
+    )
   )
 ;;(use-package org-fragtog)
 
 
 ;;; laas
-(use-package laas
-  :ensure nil
-  :after (:any org latex)
-  :hook
-  (LaTeX-mode . laas-mode)
-  (org-mode . laas-mode)
-  )
+;; (use-package laas
+;;   :ensure nil
+;;   :after (:any org latex)
+;;   :hook
+;;   (LaTeX-mode . laas-mode)
+;;   (org-mode . laas-mode)
+;;   )
 
 
 

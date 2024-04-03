@@ -48,7 +48,7 @@
 ;;; tree-sitter
 ;; 1. 编译emacs29.1  
 ;; 2. 添加动态模块
-(add-to-list 'treesit-extra-load-path "~/.config/emacs/tree-sitter/")
+;;(add-to-list 'treesit-extra-load-path "~/.config/emacs/tree-sitter/")
 ;;3. melpa 下载 tree-auto
 (use-package treesit-auto
   :ensure t

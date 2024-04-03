@@ -13,7 +13,8 @@
 (defun +init-font ()
   (when (display-graphic-p)  
     ;; 设置英语字体
-    (cl-loop for font in '("Fira Code" "iosevka" "Consolas" "Cascadia Code" "SF Mono" "Source Code Pro"
+    (cl-loop for font in '("Fira Code"  "FiraCode Nerd Font" "iosevka"
+			   "Consolas" "Cascadia Code" "SF Mono" "Source Code Pro"
                             "Menlo" "Monaco" "Dejavu Sans Mono"
                            "Lucida Console" "SAS Monospace")
              when (+font-installed-p font)
@@ -22,17 +23,23 @@
                      :font (font-spec :family font
                                       :weight 'normal
                                       :slant 'normal
-                                      :size (cond ((eq system-type 'gnu/linux) 32)
+                                      :size (cond ((eq system-type 'gnu/linux) 36)
                                                   ((eq system-type 'windows-nt) 12.5)))))
-    ;; 设置 emoji 字体
-    (cl-loop for font in '("all-the-icons" "OpenSansEmoji" "Noto Color Emoji" "Segoe UI Emoji"
-                           "EmojiOne Color" "Apple Color Emoji" "Symbola" "Symbol")
+
+    (cl-loop for font in '("Sarasa UI SC" "Symbol" "Symbola" "Segoe UI Symbol"  )
              when (+font-installed-p font)
-             return (set-fontset-font t 'unicode
-                                      (font-spec :family font
-						 :size (cond ((eq system-type 'gnu/linux) 32)
-                                                             ((eq system-type 'windows-nt) 12.5)))
-                                      nil 'prepend))
+             return (if (< emacs-major-version 27)
+                        (set-fontset-font "fontset-default" 'unicode font nil 'prepend)
+                      (set-fontset-font t 'symbol (font-spec :family font) nil 'prepend)))
+    
+    ;; 设置 emoji 字体
+    (cl-loop for font in '("Sarasa UI SC" "nerd-icons" "Symbola" "Noto Color Emoji"  
+                           "EmojiOne Color" "Apple Color Emoji" "Segoe UI Emoji"
+			   "OpenSansEmoji" )
+             when (+font-installed-p font) 
+             return (set-fontset-font t 'emoji
+                                      (font-spec :family font)
+                                      nil 'prepend)) 
     ;; 设置中文字体
     (cl-loop for font in '("LXGW Wenkai" "Sarasa Mono SC" "微软雅黑 CN" "思源黑体 CN" "思源宋体 CN" 
                            "Source Han Sans CN" "Source Han Serif CN"
@@ -43,7 +50,7 @@
                                       (font-spec :name font
 						 :weight 'normal
 						 :slant 'normal
-						 :size (cond ((eq system-type 'gnu/linux) 32)
+						 :size (cond ((eq system-type 'gnu/linux) 36)
                                                              ((eq system-type 'windows-nt) 13.5)))))
     ;; (cl-loop for font in '("HanaMinB" "SimSun-ExtB")
     ;;          when (+font-installed-p font)
@@ -56,6 +63,7 @@
     ))
 
 (+init-font)
+
 
 
 (when (fboundp 'menu-bar-mode)
@@ -86,9 +94,28 @@
   (setq default-frame-alist '((alpha-background . 85)))
   )
 ;; 在菜单中添加最近编辑过的文件选项
-(require 'recentf)
-(recentf-mode 1)
-(setq recentf-max-menu-items 10)
+(use-package recentf
+  :config
+  ;;(setq recentf-save-file "~/.emacs.d/recentf")
+  ;; 不自动清理 recentf 记录。
+  ;;(setq recentf-auto-cleanup 'never)
+  ;; emacs 退出时清理 recentf 记录。
+  ;;(add-hook 'kill-emacs-hook #'recentf-cleanup)
+  ;; 每 5min 以及 emacs 退出时保存 recentf-list。
+  ;;(run-at-time nil (* 5 60) 'recentf-save-list)
+  ;;(add-hook 'kill-emacs-hook #'recentf-save-list)
+  ;;(setq recentf-max-menu-items 100)
+  ;;(setq recentf-max-saved-items 200) ;; default 20
+  ;; recentf-exclude 的参数是正则表达式列表，不支持 ~ 引用家目录。
+  ;; emacs-dashboard 不显示这里排除的文件。  
+  (setq recentf-exclude `(,(recentf-expand-file-name "~\\(straight\\|ln-cache\\|etc\\|var\\|.cache\\|backup\\|elfeed\\)/.*")
+                          ,(recentf-expand-file-name "~\\(recentf\\|bookmarks\\|archived.org\\)")
+                          ,tramp-file-name-regexp ;; 不在 recentf 中记录 tramp 文件，防止 tramp 扫描时卡住。
+                          "^/tmp" "\\.bak\\'" "\\.gpg\\'" "\\.gz\\'" "\\.tgz\\'" "\\.xz\\'" "\\.zip\\'" "^/ssh:" "\\.png\\'"
+                          "\\.jpg\\'" "/\\.git/" "\\.gitignore\\'" "\\.log\\'" "COMMIT_EDITMSG" "\\.pyi\\'" "\\.pyc\\'"
+                          "/private/var/.*" "^/usr/local/Cellar/.*" ".*/vendor/.*"
+                          ,(concat package-user-dir "/.*-autoloads\\.egl\\'")))
+  (recentf-mode +1))
 
 ;; 设置行号
 (global-display-line-numbers-mode 1)
@@ -154,7 +181,7 @@
   :ensure t
   :hook (after-init . doom-modeline-mode)
   :custom
-  (doom-modeline-height 45)
+  (doom-modeline-height 90)
   (doom-modeline-icon nil)
   (doom-modeline-buffer-name t)
   (doom-modeline-lsp t)
@@ -168,9 +195,18 @@
 (setq display-time-format "%Y-%m-%d %A %H:%M")
 
 ;; all-the-icons
-(use-package all-the-icons
+;; (use-package all-the-icons
+;;   :ensure t
+;;   :if (display-graphic-p))
+(use-package nerd-icons
   :ensure t
-  :if (display-graphic-p))
+  :custom
+  (nerd-icons-font-family "Sarasa Term SC Nerd")
+  :config
+  (when (and (display-graphic-p)
+	     (not (+font-installed-p nerd-icons-font-family)))
+    (nerd-icons-install-fonts t))
+  )
 
 
 ;; 启动时关闭系统输入法
@@ -194,7 +230,8 @@
       (w32-set-ime-open-status t))))
 (when (eq system-type 'gnu/linux)
   ;; 由于 fcitx 的显示不是很好，所以暂时在 wsl 中 emacs 中不使用系统输入法
-  (setq pgtk-use-im-context-on-new-connection nil))
+  ;;(setq pgtk-use-im-context-on-new-connection nil)
+  )
 ;; rime 输入法
 (use-package rime
   :ensure t
@@ -208,7 +245,7 @@
   (cond ((eq system-type 'windows-nt)
 	 (setq rime-share-data-dir "c:/msys64/mingw64/share/rime-data"))
 	((eq system-type 'gnu/linux)
-	 (setq rime-share-data-dir "/home/liuwei/.local/share/fcitx5/rime")
+	 (setq rime-share-data-dir "~/.local/share/fcitx5/rime")
 	 (setq rime-user-data-dir "~/.config/fcitx5/rime")
 	 ))  
   (set-face-attribute 'rime-preedit-face nil :background "black" :foreground "gray"))
@@ -224,14 +261,13 @@
 ;; helpful
 (use-package helpful
   :ensure t
-  :defer t
-  :custom
-  (counsel-describe-function-function #'helpful-callable)
-  (counsel-describe-variable-function #'helpful-variable)
+  ;;:custom
+  ;;(counsel-describe-function-function #'helpful-callable)
+  ;;(counsel-describe-variable-function #'helpful-variable)
   :bind
-  ([remap describe-function] . counsel-describe-function)
+  ;;([remap describe-function] . counsel-describe-function)
   ([remap describe-command] . helpful-command)
-  ([remap describe-variable] . counsel-describe-variable)
+  ;;([remap describe-variable] . counsel-describe-variable)
   ([remap describe-key] . helpful-key))
 
 ;; elisp-demos
@@ -246,7 +282,7 @@
 ;; dirvish
 (use-package dirvish
   :ensure nil
-  :load-path "elpa/dirvish-20230519.1500"
+  ;;:load-path "elpa/dirvish-20230519.1500"
   :hook
   (after-init . dirvish-override-dired-mode)
   :config
@@ -254,7 +290,7 @@
   (setq dirvish-mode-line-format
         '(:left (sort symlink) :right (omit yank index)))
   (setq dirvish-attributes
-        '(all-the-icons file-time file-size collapse subtree-state vc-state git-msg))
+        '(nerd-icons file-time file-size collapse subtree-state vc-state git-msg))
   (setq delete-by-moving-to-trash t)
   (setq dired-listing-switches
         "-l --almost-all --human-readable --group-directories-first --no-group")

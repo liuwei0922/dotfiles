@@ -138,10 +138,14 @@
   :bind
   (:map isearch-mode-map
 	("DEL" . isearch-del-char)))
-  
 
 
- 
+;;; autorevert
+(use-package autorevert
+  :after org-agenda
+  :config
+  (add-hook 'org-mode-hook #'turn-on-auto-revert-mode))
+
 
 ;;; server
 (use-package server
@@ -161,6 +165,13 @@
 				 ;; 关闭鼠标滚动标志
 				 (set-scroll-bar-mode nil))
 			       ))
+  (server-after-make-frame . (lambda ()
+			       (use-package expand-region
+				 :ensure t
+				 :bind
+				 ("C-=" . #'er/expand-region)
+				 ("C--" . #'er/contract-region))
+			       (global-set-key (kbd "C-;") #'set-mark-command)))
   :config
   (if (not (server-running-p))
       (server-start)))
@@ -195,10 +206,22 @@
   :custom
   ;; Always use file cache when using tramp
   (remote-file-name-inhibit-cache nil)
-  (tramp-default-method "ssh")
-  ;:config
-  ;;(setq tramp-verbose 10)
-  ;;(add-to-list 'tramp-remote-path "/home/lhaaso/wliu/.local/bin")
+  (tramp-default-method "sshx")
+  :config
+  (setq tramp-verbose 10)
+  (add-to-list 'tramp-remote-path "/home/lhaaso/wliu/.local/bin")
+  (add-to-list 'tramp-remote-path "/home/liuwei/.local/bin")
+  ;; (connection-local-set-profile-variables
+  ;;  'remote-bash
+  ;;  '((explicit-shell-file-name . "/bin/bash")
+  ;;    (explicit-bash-args . ("-i"))
+  ;;    ))
+  ;; (connection-local-set-profiles
+  ;;  '(:application tramp :machine "detect" :user "liuwei")
+  ;;  'remote-bash)
+  ;; (let ((process-environment tramp-remote-process-environment))
+  ;;   (setenv "ENV" "$HOME/.profile")
+  ;;   (setq tramp-remote-process-environment process-environment))
   )
 
 
@@ -251,7 +274,7 @@
 
 ;; avy
 (use-package avy
-  :ensure nil
+  :ensure t
   :bind (:map global-map
 	      ("C-'" . avy-goto-char-timer) ; Control + 单引号
               ;; 复用上一次搜索
@@ -279,12 +302,20 @@
 	("M-s" . nil))
   )
 
-
 ;; 快速选中区域
-(use-package expand-region
-  :ensure t
-  :bind (("C-=" . er/expand-region)
- 	 ("C--" . er/contract-region)))
+(when (display-graphic-p)
+    (use-package expand-region
+      :ensure t
+      :bind
+      ("C-=" . #'er/expand-region)
+      ("C--" . #'er/contract-region))
+      )
+(if (daemonp)
+    (use-package expand-region
+      :ensure t
+      :bind
+      ("M-=" . #'er/expand-region)
+      ("M--" . #'er/contract-region)))
 
 
 ;;; magit
@@ -299,7 +330,8 @@
   :defer t
   :hook
   ;;取消下划线
-  (eshell-mode . (lambda () (setq global-hl-line-mode nil))))
+  (eshell-mode . (lambda () (setq global-hl-line-mode nil)))
+  (eshell-mode . (lambda () (display-line-numbers-mode -1))))
 
 ;;; vterm
 (use-package vterm
@@ -413,6 +445,12 @@
               (make-local-variable 'company-idle-delay)
               (setq-local company-idle-delay 0.1))))
 
+(use-package exec-path-from-shell
+  :if (daemonp)
+  :ensure t
+  :config
+  (setq exec-path-from-shell-arguments '("-l"))
+  (exec-path-from-shell-initialize))
 
 ;;; yasnippet
 (use-package yasnippet
@@ -421,10 +459,10 @@
   :diminish yas-minor-mode
   :bind
   (:map yas-minor-mode-map
-   ("<tab>" . nil)
-   ("TAB" . nil)
-   ("C-c y" . yas-expand)
-   ("<space>" . yas-maybe-expand))
+	("<tab>" . nil)
+	("TAB" . nil)
+	("C-c y" . yas-expand)
+	("<space>" . yas-maybe-expand))
   :hook
   ((prog-mode text-mode) . yas-minor-mode)
   :custom
@@ -451,11 +489,11 @@
   ;; 	(mapcar #'company-mode/backend-with-yas  company-backends))
   )
 
-(use-package ivy-yasnippet
-  :ensure t
-  :after ivy yasnippet
-  :bind
-  ("C-<tab>" . ivy-yasnippet))
+;; (use-package ivy-yasnippet
+;;   :ensure t
+;;   :after ivy yasnippet
+;;   :bind
+;;   ("C-<tab>" . ivy-yasnippet))
 
 
 
@@ -475,6 +513,7 @@
 ;;   :ensure t
 ;;   :config
 ;;   (require 'mail))
+
 
 (provide 'init-base)
 ;;; init-base.el ends here
