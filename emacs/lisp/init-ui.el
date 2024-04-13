@@ -238,6 +238,16 @@
   :custom
   (default-input-method "rime")
   (rime-cursor "˰")
+  (rime-disable-predicates
+   '(rime-predicate-prog-in-code-p
+     rime-predicate-after-alphabet-char-p
+     ))
+  (rime-inline-predicates
+   '(rime-predicate-space-after-cc-p
+     ))
+  :bind
+  (:map rime-mode-map
+   ("M-j" . rime-force-enable))
   :config
   (defun +open-flypy ()
     (interactive)
@@ -261,14 +271,11 @@
 ;; helpful
 (use-package helpful
   :ensure t
-  ;;:custom
-  ;;(counsel-describe-function-function #'helpful-callable)
-  ;;(counsel-describe-variable-function #'helpful-variable)
   :bind
-  ;;([remap describe-function] . counsel-describe-function)
-  ([remap describe-command] . helpful-command)
-  ;;([remap describe-variable] . counsel-describe-variable)
-  ([remap describe-key] . helpful-key))
+  ([remap describe-function] . #'helpful-callable)
+  ([remap describe-command] . #'helpful-command)
+  ([remap describe-variable] . #'helpful-variable)
+  ([remap describe-key] . #'helpful-key))
 
 ;; elisp-demos
 (use-package elisp-demos
@@ -281,8 +288,7 @@
 
 ;; dirvish
 (use-package dirvish
-  :ensure nil
-  ;;:load-path "elpa/dirvish-20230519.1500"
+  :ensure t
   :hook
   (after-init . dirvish-override-dired-mode)
   :config

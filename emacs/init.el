@@ -129,7 +129,7 @@
  ;; If there is more than one, they won't work right.
  '(company-show-quick-access 9 nil nil "Customized with use-package company")
  '(package-selected-packages
-   '(exec-path-from-shell vterm ebib cmake-mode nerd-icons org-download xenops denote citar-embark citar org-bullets markdown-mode biblio hledger-mode magit all-the-icons dirvish doom-modeline doom-themes elisp-demos embark-consult helpful marginalia orderless quelpa-use-package rainbow-delimiters rime vertico)))
+   '(yaml-mode nerd-icons-corfu corfu-prescient corfu-terminal corfu eat consult-yasnippet text-mode exec-path-from-shell vterm ebib cmake-mode nerd-icons org-download xenops denote citar-embark citar org-bullets markdown-mode biblio hledger-mode magit all-the-icons dirvish doom-modeline doom-themes elisp-demos embark-consult helpful marginalia orderless quelpa-use-package rainbow-delimiters rime vertico)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

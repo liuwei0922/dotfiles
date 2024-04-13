@@ -2,15 +2,13 @@
 
 (require 'init-utils)
 
-(when (daemonp)
-  )
-
 (defmacro use-package! (package &rest body)
-  `(if (daemonp)
-       (use-package ,package
+  (if (daemonp)
+      `(use-package ,package
+	 :if (daemonp)
 	 :ensure t
 	 ,@body)
-     (use-package ,package
+    `(use-package ,package
        :ensure nil
        :defer t
        ,@body)))
@@ -36,6 +34,9 @@
    (org-mode . (lambda () (display-line-numbers-mode -1)))
    ;; 设置 ORG 标题样式
    (org-cycle-tab-first . +org-cycle-only-current-subtree-h)
+   (org-mode . (lambda ()
+		 ;; 设置折行
+		 (global-word-wrap-whitespace-mode 1)))
    )
   :custom
   ;; 文件相关设置
@@ -601,10 +602,29 @@ This function makes sure that dates are aligned for easy reading."
 
 (use-package biblio
   :ensure nil
+  :after citar
   :custom
   (biblio-download-directory "~/org/bibtex-pdfs/")
   )
 
+(use-package ebib
+  :ensure nil
+  :after citar
+  :custom
+  (ebib-default-directory "~/org/bibliography/")
+  (ebib-bib-search-dirs "~/org/bibliography/")
+  (ebib-file-search-dirs '("~/org/bibtex-pdfs"))
+  (ebib-preload-bib-files '("~/org/bibliography/references.bib"))
+  (ebib-bibtex-dialect 'biblatex)
+  (ebib-file-associations '(("pdf" . +okular-open-pdf)))
+  )
+
+(use-package ebib-biblio
+  :after (ebib biblio)
+  :bind (:map ebib-index-mode-map
+              ("B" . ebib-biblio-import-doi)
+              :map biblio-selection-mode-map
+              ("e" . ebib-biblio-selection-import)))
 
 ;; (use-package org-modern
 ;;   :ensure nil

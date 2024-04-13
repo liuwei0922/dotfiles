@@ -68,8 +68,9 @@
 	  browse-url-generic-args     '("/c" "start")
 	  browse-url-browser-function #'browse-url-generic))
 ;; Pixelwise resize
-(setq window-resize-pixelwise t
-      frame-resize-pixelwise t)
+(setq ;;window-resize-pixelwise t
+      frame-resize-pixelwise t
+      )
 ;; No lock files
 (setq create-lockfiles nil)
 
@@ -158,12 +159,15 @@
 			       ;; 全屏
 			       (let ((fullscreen (frame-parameter nil 'fullscreen)))
 				 (unless (eq fullscreen 'maximized)
-				   (set-frame-parameter nil 'fullscreen 'maximized))				 
-				 )
+				   (set-frame-parameter nil 'fullscreen 'maximized)))
 			       (+init-font)
 			       (when (fboundp 'set-scroll-bar-mode)
 				 ;; 关闭鼠标滚动标志
 				 (set-scroll-bar-mode nil))
+			       (if (display-graphic-p)
+				   (corfu-terminal-mode -1)
+				 (corfu-terminal-mode 1)
+				 )
 			       ))
   (server-after-make-frame . (lambda ()
 			       (use-package expand-region
@@ -174,7 +178,14 @@
 			       (global-set-key (kbd "C-;") #'set-mark-command)))
   :config
   (if (not (server-running-p))
-      (server-start)))
+      (server-start))
+  (defun +corfu-terminal ()
+    (unless (display-graphic-p)
+      (corfu-terminal-mode +1) 
+      ))
+  ;;(add-hook 'after-make-frame-functions #'+corfu-terminal)
+  )
+
 
 
 ;;; Type text
@@ -225,32 +236,7 @@
   )
 
 
-;;; company-mode
-(use-package company
-  :ensure t
-  :hook (after-init . global-company-mode)
-  :custom
-  (company-tooltip-align-annotations t)
-  (company-tooltip-limit 9)
-  ;; 显示编号
-  (company-show-numbers 9)
-  ;; 延时弹出时间
-  (company-idle-delay 0.4)
-  ;; 补全字符开始数量
-  (company-minimum-prefix-length 2)
-  (company-capf--sorted t)
-  )
-(use-package company-prescient
-  :ensure t
-  :hook
-  (company-mode . company-prescient-mode))
 
-
-(use-package company-statistics
-  :ensure t
-  :after company
-  :hook
-  (after-init . company-statistics-mode))
 
 
 ;; Press C-c s to search
@@ -340,6 +326,15 @@
   :hook
   (vterm-mode . (lambda () (global-hl-line-mode -1))))
 
+;;; eat
+(use-package eat
+  :ensure nil
+  :defer t
+  :hook
+  (eat-mode . (lambda ()
+		(global-hl-line-mode -1)
+		(global-display-line-numbers-mode -1))))
+
 
 ;;; hledger-mode
 (use-package hledger-mode
@@ -393,7 +388,7 @@
 
   :config
   (add-hook 'hledger-view-mode-hook #'hl-line-mode)
-  ;(add-hook 'hledger-view-mode-hook #'center-text-for-reading)
+					;(add-hook 'hledger-view-mode-hook #'center-text-for-reading)
 
   (add-hook 'hledger-view-mode-hook
             (lambda ()
@@ -409,8 +404,11 @@
 
   (add-hook 'hledger-mode-hook
             (lambda ()
-              (make-local-variable 'company-backends)
-              (add-to-list 'company-backends 'hledger-company)))
+              ;;(make-local-variable 'company-backends)
+	      (setq-local completion-at-point-functions
+			  (list (cape-company-to-capf #'hledger-company)))
+              ;;(add-to-list 'company-backends 'hledger-company)
+	      ))
   (add-hook 'hledger-mode-hook
 	    (lambda ()
 	      (setq-local tab-width 4)
@@ -440,10 +438,12 @@
   (setq hledger-input-buffer-height 20)
   (add-hook 'hledger-input-post-commit-hook #'hledger-show-new-balances)
   (add-hook 'hledger-input-mode-hook #'auto-fill-mode)
-  (add-hook 'hledger-input-mode-hook
-            (lambda ()
-              (make-local-variable 'company-idle-delay)
-              (setq-local company-idle-delay 0.1))))
+  ;; (add-hook 'hledger-input-mode-hook
+  ;;           (lambda ()
+  ;;             (make-local-variable 'company-idle-delay)
+  ;;             (setq-local company-idle-delay 0.1)
+  ;; 	      ))
+  )
 
 (use-package exec-path-from-shell
   :if (daemonp)
@@ -472,7 +472,7 @@
   )
 (use-package yasnippet-snippets
   :ensure t 
-  :after (:all company yasnippet)
+  :after (yasnippet)
   ;; :config
   ;; (defvar company-mode/enable-yas t
   ;;   "Enable yasnippet for all backands")
@@ -488,6 +488,11 @@
   ;; (setq company-backends
   ;; 	(mapcar #'company-mode/backend-with-yas  company-backends))
   )
+
+
+;; consult-yasnippet
+(use-package consult-yasnippet
+  :after yasnippet)
 
 ;; (use-package ivy-yasnippet
 ;;   :ensure t

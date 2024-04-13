@@ -1,7 +1,7 @@
 var:
-  last_build_time: 1712144608
+  last_build_time: 1712989133
   option:
-    ascii_mode: false
+    ascii_mode: true
   previously_selected_schema: flypy
   schema_access_time:
     flypy: 1528384719
