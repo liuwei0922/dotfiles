@@ -34,6 +34,8 @@
     neofetch
     nnn # terminal file manager
 
+    emacs29-pgtk
+
     # archives
     zip
     xz
