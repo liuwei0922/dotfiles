@@ -27,10 +27,11 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    ssh-git-dotfiles = {
-      url = "git+ssh://git@github.com:liuwei0922/dotfiles.git?shallow=1";
-      flake = false;
-    };
+
+    #ssh-git-dotfiles = {
+    #  url = "git+ssh://git@github.com:liuwei0922/dotfiles.git?shallow=1";
+    #  flake = false;
+    #};
   };
 
   outputs = { self,nixpkgs,nixos-wsl,home-manager,... }@inputs: {

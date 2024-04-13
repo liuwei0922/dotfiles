@@ -97,7 +97,7 @@
 
   # 递归将某个文件夹中的文件，链接到 Home 目录下的指定位置
    home.file.".config/emacs" = {
-     source = ../../emacs
+     source = ../../emacs;
      recursive = true;   # 递归整个文件夹
    };
 
