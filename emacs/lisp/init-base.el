@@ -43,8 +43,10 @@
 (prefer-coding-system 'utf-8)
 (setq buffer-file-coding-system 'utf-8-unix)
 ;; 自动保存
-(auto-save-mode t)
-(auto-save-visited-mode t)
+(add-hook 'find-file-hook
+	  (lambda ()
+	    (auto-save-mode t)
+	    (auto-save-visited-mode t)))
 ;; 禁止 NATIVE-COMPILE
 (setq no-native-compile t)
 ;; 禁止Emacs自动生成备份文件
@@ -202,7 +204,7 @@
 ;; 打开文件时, 光标自动定位到上次停留的位置
 (use-package saveplace
   :ensure nil
-  :hook (after-init . save-place-mode))
+  :hook (find-file . save-place-mode))
 
 
 ;; Workaround with minified source files
@@ -491,8 +493,9 @@
 
 
 ;; consult-yasnippet
-(use-package consult-yasnippet
-  :after yasnippet)
+;; (use-package consult-yasnippet
+;;   :ensure nil
+;;   )
 
 ;; (use-package ivy-yasnippet
 ;;   :ensure t

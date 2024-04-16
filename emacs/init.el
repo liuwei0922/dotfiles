@@ -10,7 +10,7 @@
 ;; Increase how much is read from processes in a single chunk (default is 4kb).
 ;; `lsp-mode' benefits from that.
 (setq read-process-output-max (* 4 1024 1024))
-
+(setq custom-file (concat user-emacs-directory "custom.el"))
 
 ;;; 加载包设置
 (require 'package)
@@ -120,19 +120,3 @@
 					      (t
 					       (apply orig-fun args)
 					       (use-local-map +read-only-mode-map)))))
-
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(company-show-quick-access 9 nil nil "Customized with use-package company")
- '(package-selected-packages
-   '(yaml-mode nerd-icons-corfu corfu-prescient corfu-terminal corfu eat consult-yasnippet text-mode exec-path-from-shell vterm ebib cmake-mode nerd-icons org-download xenops denote citar-embark citar org-bullets markdown-mode biblio hledger-mode magit all-the-icons dirvish doom-modeline doom-themes elisp-demos embark-consult helpful marginalia orderless quelpa-use-package rainbow-delimiters rime vertico)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )

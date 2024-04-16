@@ -1,5 +1,6 @@
 {
   pkgs,
+  config,
   ...
 }: {
   # 主要区别就是这个 wsl 模块
@@ -7,6 +8,7 @@
     enable = true;
     defaultUser = "moxian";
     nativeSystemd = true;
+    interop.includePath = false;
     # 创建软件的桌面快捷方式
     #startMenuLaunchers = true;
   };

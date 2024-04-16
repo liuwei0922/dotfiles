@@ -1,6 +1,11 @@
 { config, pkgs, ... }:
 
 {
+
+  imports = [
+    ./shell
+  ];
+  
   # 注意修改这里的用户名与用户目录
   home.username = "moxian";
   home.homeDirectory = "/home/moxian";
@@ -35,6 +40,8 @@
     nnn # terminal file manager
 
     emacs29-pgtk
+    librime
+    wl-clipboard
 
     # archives
     zip
@@ -43,6 +50,7 @@
     p7zip
 
     # utils
+    fd
     ripgrep # recursively searches directories for a regex pattern
     jq # A lightweight and flexible command-line JSON processor
     yq-go # yaml processor https://github.com/mikefarah/yq
@@ -86,41 +94,22 @@
   };
 
   # 启用 starship，这是一个漂亮的 shell 提示符
-  programs.starship = {
-    enable = true;
-    # 自定义配置
-    settings = {
-      add_newline = false;
-      aws.disabled = true;
-      gcloud.disabled = true;
-      line_break.disabled = true;
-    };
-  };
+  #programs.starship = {
+  #  enable = false;
+  #  # 自定义配置
+  #  settings = {
+  #    add_newline = false;
+  #    aws.disabled = true;
+  #    gcloud.disabled = true;
+  #    line_break.disabled = true;
+  #  };
+  #};
 
   # 递归将某个文件夹中的文件，链接到 Home 目录下的指定位置
    home.file.".config/emacs" = {
      source = ../../emacs;
      recursive = true;   # 递归整个文件夹
    };
-
-
-  programs.bash = {
-    enable = true;
-    enableCompletion = true;
-    # TODO 在这里添加你的自定义 bashrc 内容
-    bashrcExtra = ''
-      export PATH="$PATH:$HOME/bin:$HOME/.local/bin:$HOME/go/bin"
-    '';
-
-    # TODO 设置一些别名方便使用，你可以根据自己的需要进行增删
-    shellAliases = {
-      la = "ls -a --color";
-      ll = "ls -l --color";
-      k = "kubectl";
-      urldecode = "python3 -c 'import sys, urllib.parse as ul; print(ul.unquote_plus(sys.stdin.read()))'";
-      urlencode = "python3 -c 'import sys, urllib.parse as ul; print(ul.quote_plus(sys.stdin.read()))'";
-    };
-  };
 
   # This value determines the Home Manager release that your
   # configuration is compatible with. This helps avoid breakage

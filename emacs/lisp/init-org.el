@@ -469,7 +469,8 @@ This function makes sure that dates are aligned for easy reading."
 
 ;;; 美化工具
 (use-package org-bullets
-  :ensure nil
+  :ensure t
+  :defer t
   :after org
   :hook
   (org-mode . (lambda () (org-bullets-mode 1))))
@@ -477,7 +478,8 @@ This function makes sure that dates are aligned for easy reading."
 
 ;;; denote
 (use-package denote
-  :ensure nil
+  :ensure t
+  :defer t
   :after org
   :bind
   (("C-c n n" . denote)
@@ -502,7 +504,8 @@ This function makes sure that dates are aligned for easy reading."
 
 ;;; org-download
 (use-package org-download
-  :ensure nil
+  :ensure t
+  :defer t
   :after org
   :hook
   ((org-mode dired-mode) . org-download-enable)
@@ -530,8 +533,9 @@ This function makes sure that dates are aligned for easy reading."
 
 ;;; xenops
 (use-package xenops
-  :ensure nil
-  :after (:any org latex)
+  :ensure t
+  :defer t
+  :after (latex)
   :hook
   ;; (org-mode . (lambda ()
   ;; 		(unless (and (boundp 'org-capture-mode)
@@ -566,7 +570,8 @@ This function makes sure that dates are aligned for easy reading."
 
 ;;; org-citar
 (use-package citar
-  :ensure nil
+  :ensure t
+  :defer t
   :after (:any org latex)
   :custom
   (citar-bibliography '("~/org/bibliography/references.bib"))
@@ -593,6 +598,7 @@ This function makes sure that dates are aligned for easy reading."
   (add-to-list 'citar-file-open-functions '("pdf" . +okular-open-pdf)))
 
 (use-package citar-embark
+  :ensure t
   :after citar embark
   :no-require
   :config
@@ -601,14 +607,14 @@ This function makes sure that dates are aligned for easy reading."
 
 
 (use-package biblio
-  :ensure nil
+  :ensure t
   :after citar
   :custom
   (biblio-download-directory "~/org/bibtex-pdfs/")
   )
 
 (use-package ebib
-  :ensure nil
+  :ensure t
   :after citar
   :custom
   (ebib-default-directory "~/org/bibliography/")
@@ -741,8 +747,8 @@ This function makes sure that dates are aligned for easy reading."
 ;;     ))
 
 ;; markdown-mode
-(use-package markdown-mode
-  :ensure nil)
+;; (use-package markdown-mode
+;;   :ensure nil)
 
 
 (provide 'init-org)

@@ -205,6 +205,8 @@
   ;;(add-to-list 'completion-at-point-functions #'cape-elisp-symbol)
   ;;(add-to-list 'completion-at-point-functions #'cape-line)
   :config
+  (unless (package-installed-p 'company)
+    (package-install 'company))
   (require 'company)
   )
 
