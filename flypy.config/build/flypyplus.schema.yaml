@@ -217,6 +217,7 @@ speller:
   finals: "/"
   initials: "abcdefghijklmnopqrstuvwxyz;/"
   max_code_length: 8
+  encode_commit_history: false
 style:
   horizontal: true
 switches:

@@ -152,16 +152,16 @@
   :init
   (global-corfu-mode))
 
-(use-package nerd-icons-corfu
-  :ensure t
-  :after corfu
-  :config
-  (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter)
-  ;; Optionally:
-  (setq nerd-icons-corfu-mapping
-	'((array :style "cod" :icon "symbol_array" :face font-lock-type-face)
-          (boolean :style "cod" :icon "symbol_boolean" :face font-lock-builtin-face)
-          (t :style "cod" :icon "code" :face font-lock-warning-face))))
+;; (use-package nerd-icons-corfu
+;;   :ensure t
+;;   :after corfu
+;;   :config
+;;   (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter)
+;;   Optionally:
+;;   (setq nerd-icons-corfu-mapping
+;; 	'((array :style "cod" :icon "symbol_array" :face font-lock-type-face)
+;;           (boolean :style "cod" :icon "symbol_boolean" :face font-lock-builtin-face)
+;;           (t :style "cod" :icon "code" :face font-lock-warning-face))))
 
 
 ;; Add extensions

@@ -198,15 +198,15 @@
 ;; (use-package all-the-icons
 ;;   :ensure t
 ;;   :if (display-graphic-p))
-(use-package nerd-icons
-  :ensure t
-  :custom
-  (nerd-icons-font-family "Sarasa Term SC Nerd")
-  :config
-  (when (and (display-graphic-p)
-	     (not (+font-installed-p nerd-icons-font-family)))
-    (nerd-icons-install-fonts t))
-  )
+;; (use-package nerd-icons
+;;   :ensure nil
+;;   :custom
+;;   (nerd-icons-font-family "Sarasa Term SC Nerd")
+;;   :config
+;;   (when (and (display-graphic-p)
+;; 	     (not (+font-installed-p nerd-icons-font-family)))
+;;     (nerd-icons-install-fonts t))
+;;   )
 
 
 ;; 启动时关闭系统输入法

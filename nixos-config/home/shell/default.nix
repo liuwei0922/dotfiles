@@ -1,27 +1,12 @@
 { config , pkgs,...}:
 {
-  # home.sessionVariables= {
-  #   GDK_DPI_SCALE=2;
-  #   GDK_SCALE=0.5;
-  #   LEDGER_FILE="~/org/account/account.journal";
-  #   PATH="$PATH:$HOME/bin:$HOME/.local/bin:$HOME/go/bin";
-  # };
- 
-  home.file.".profile".text =''
-    export GDK_DPI_SCALE=2;
-    export GDK_SCALE=0.5;
-    export LEDGER_FILE="~/org/account/account.journal";
-    export PATH="$PATH:$HOME/bin:$HOME/.local/bin:$HOME/go/bin";
-'';
-
   programs.bash = {
     enable = true;
     enableCompletion = true;
     # TODO 在这里添加你的自定义 bashrc 内容
     #bashrcExtra = '''';
+    # export GDK_DPI_SCALE=2;    export GDK_SCALE=0.5;
     profileExtra = ''
-    export GDK_DPI_SCALE=2;
-    export GDK_SCALE=0.5;
     export LEDGER_FILE="~/org/account/account.journal";
     export PATH="$PATH:$HOME/bin:$HOME/.local/bin:$HOME/go/bin";
 '';

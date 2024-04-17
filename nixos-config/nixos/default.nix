@@ -42,8 +42,6 @@
     pciutils # lspci
     usbutils # lsusb
   ];
-  # 将默认编辑器设置为 vim
-  environment.variables.EDITOR = "vim";
   
   users.users.moxian = {
     isNormalUser = true;
@@ -51,6 +49,17 @@
     extraGroups = [ "networkmanager" "wheel" ];
   };
   time.timeZone = "Asia/Shanghai";
+
+  environment.variables = {
+    GDK_DPI_SCALE="2";
+    GDK_SCALE="0.5";
+    EDITOR = "vim";
+  };
+  systemd.globalEnvironment = {
+    GDK_DPI_SCALE="2";
+    GDK_SCALE="0.5";
+  };
+  
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It's perfectly fine and recommended to leave

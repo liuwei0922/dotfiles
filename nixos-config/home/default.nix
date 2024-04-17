@@ -3,7 +3,10 @@
 {
 
   imports = [
+    #./systemd
     ./shell
+    ./emacs
+    ./rime
   ];
   
   # 注意修改这里的用户名与用户目录
@@ -39,7 +42,7 @@
     neofetch
     nnn # terminal file manager
 
-    emacs29-pgtk
+    #emacs29-pgtk
     librime
     wl-clipboard
 
@@ -105,11 +108,6 @@
   #  };
   #};
 
-  # 递归将某个文件夹中的文件，链接到 Home 目录下的指定位置
-   home.file.".config/emacs" = {
-     source = ../../emacs;
-     recursive = true;   # 递归整个文件夹
-   };
 
   # This value determines the Home Manager release that your
   # configuration is compatible with. This helps avoid breakage
