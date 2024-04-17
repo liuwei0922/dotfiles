@@ -14,6 +14,13 @@
             (shell-command-to-string "uname -r")))
   (setq +system-type 'wsl))
 
+(defvar +linux-type 'nil)
+(when (eq system-type 'gnu/linux)
+  (cond ((executable-find "nixos-rebuild")
+	 (setq +linux-type 'nixos))
+	((executable-find "pacman")
+	 (setq +linux-type 'arch))))
+
 
 
 (provide 'init-utils)

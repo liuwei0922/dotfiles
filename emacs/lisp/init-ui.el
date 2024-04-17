@@ -4,6 +4,8 @@
 
 ;;; Code:
 
+
+(require 'init-utils)
 ;; 设置字体
 ;; 判断字体是否存在
 (defun +font-installed-p (font-name)
@@ -249,6 +251,20 @@
   (:map rime-mode-map
    ("M-j" . rime-force-enable))
   :config
+  (when (eq +linux-type 'nixos)
+    (setq rime-emacs-module-header-root
+     (concat
+      (file-truename (concat invocation-directory invocation-name))
+      "/include"))
+    (setq rime-librime-root
+     (shell-command-to-string
+      "nix eval --raw '(let pkgs = import <nixpkgs> {}; in with pkgs; lib.getLib librime)'"))
+    ;; (setq rime-share-data-dir
+    ;;  (concat
+    ;;   (shell-command-to-string
+    ;;    "nix eval --raw '(let pkgs = import <nixpkgs> {}; in with pkgs; lib.getLib brise)'")
+    ;;   "/share/rime-data"))
+    )
   (defun +open-flypy ()
     (interactive)
     (set-input-method "rime"))

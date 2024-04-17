@@ -172,12 +172,20 @@
 				 )
 			       ))
   (server-after-make-frame . (lambda ()
-			       (use-package expand-region
-				 :ensure t
-				 :bind
-				 ("C-=" . #'er/expand-region)
-				 ("C--" . #'er/contract-region))
-			       (global-set-key (kbd "C-;") #'set-mark-command)))
+			       (if (display-graphic-p)
+				   (progn
+				     (use-package expand-region
+				       :bind
+				       ("C-=" . #'er/expand-region)
+				       ("C--" . #'er/contract-region))
+				     (global-set-key (kbd "C-;") #'set-mark-command)
+				     (global-unset-key (kbd "M-;")))
+				 (progn
+				   (use-package expand-region
+				     :bind
+				     ("M-=" . #'er/expand-region)
+				     ("M--" . #'er/contract-region))
+				   (global-set-key (kbd "M-;") #'set-mark-command)))))
   :config
   (if (not (server-running-p))
       (server-start))
@@ -298,12 +306,7 @@
       ("C-=" . #'er/expand-region)
       ("C--" . #'er/contract-region))
       )
-(if (daemonp)
-    (use-package expand-region
-      :ensure t
-      :bind
-      ("M-=" . #'er/expand-region)
-      ("M--" . #'er/contract-region)))
+(if (daemonp))
 
 
 ;;; magit

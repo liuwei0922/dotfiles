@@ -2,19 +2,19 @@
   description = "A simple NixOS flake";
 
   # the nixConfig here only affects the flake itself, not the system configuration!
-  nixConfig = {
-    # override the default substituters
-    substituters = [
-      # cache mirror located in China
-      # status: https://mirror.sjtu.edu.cn/
-      "https://mirror.sjtu.edu.cn/nix-channels/store"
-      # status: https://mirrors.ustc.edu.cn/status/
-      #"https://mirrors.ustc.edu.cn/nix-channels/store"
-      "https://cache.nixos.org"
-      # nix community's cache server
-      "https://nix-community.cachix.org"
-    ];
-  };
+  #nixConfig = {
+  #  # override the default substituters
+  #  substituters = [
+  #    # cache mirror located in China
+  #    # status: https://mirror.sjtu.edu.cn/
+  #    "https://mirror.sjtu.edu.cn/nix-channels/store"
+  #    # status: https://mirrors.ustc.edu.cn/status/
+  #    #"https://mirrors.ustc.edu.cn/nix-channels/store"
+  #    "https://cache.nixos.org"
+  #    # nix community's cache server
+  #    "https://nix-community.cachix.org"
+  #  ];
+  #};
 
 
 
@@ -24,9 +24,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager = {
-      url = "github:nix-community/home-manager";
+      url = "github:nix-community/home-manager/release-23.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixpkgs.url="https://mirrors.ustc.edu.cn/nix-channels/nixos-23.11/nixexprs.tar.xz";
 
     #ssh-git-dotfiles = {
     #  url = "git+ssh://git@github.com:liuwei0922/dotfiles.git?shallow=1";

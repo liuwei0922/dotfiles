@@ -43,11 +43,11 @@
     usbutils # lsusb
   ];
   
-  users.users.moxian = {
-    isNormalUser = true;
-    description = "ryan";
-    extraGroups = [ "networkmanager" "wheel" ];
-  };
+  #users.users.moxian = {
+  #  isNormalUser = true;
+  #  description = "ryan";
+  #  extraGroups = [ "networkmanager" "wheel" ];
+  #};
   time.timeZone = "Asia/Shanghai";
 
   environment.variables = {
@@ -55,10 +55,10 @@
     GDK_SCALE="0.5";
     EDITOR = "vim";
   };
-  systemd.globalEnvironment = {
-    GDK_DPI_SCALE="2";
-    GDK_SCALE="0.5";
-  };
+  #systemd.globalEnvironment = {
+  #  GDK_DPI_SCALE="2";
+  #  GDK_SCALE="0.5";
+  #};
   
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
