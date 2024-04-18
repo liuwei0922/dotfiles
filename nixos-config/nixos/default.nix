@@ -25,22 +25,6 @@
     which 
     file
     tree
-    gnused
-    gnutar
-    gawk
-    zstd
-    gnupg
-    # system call monitoring
-    strace # system call monitoring
-    ltrace # library call monitoring
-    lsof # list open files
-
-    # system tools
-    sysstat
-    lm_sensors # for `sensors` command
-    ethtool
-    pciutils # lspci
-    usbutils # lsusb
   ];
   
   #users.users.moxian = {
@@ -54,6 +38,15 @@
     GDK_DPI_SCALE="2";
     GDK_SCALE="0.5";
     EDITOR = "vim";
+  };
+
+  programs.bash = {
+    shellInit = ''export LANG=zh_CN.UTF-8; '';
+    interactiveShellInit= ''export LANG=zh_CN.UTF-8; '';
+  };
+  
+  nixpkgs.config = {
+    allowUnfree = true;
   };
   #systemd.globalEnvironment = {
   #  GDK_DPI_SCALE="2";

@@ -306,7 +306,7 @@
       ("C-=" . #'er/expand-region)
       ("C--" . #'er/contract-region))
       )
-(if (daemonp))
+
 
 
 ;;; magit

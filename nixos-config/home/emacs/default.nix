@@ -15,6 +15,7 @@
   services.emacs = {
     enable = true;
     package = pkgs.emacs29-pgtk;
+    client.enable=true;
   };
 
   systemd.user.services.emacs.Service = {

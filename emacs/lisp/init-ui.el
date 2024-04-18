@@ -253,18 +253,10 @@
   :config
   (when (eq +linux-type 'nixos)
     (setq rime-emacs-module-header-root
-     (concat
-      (file-truename (concat invocation-directory invocation-name))
-      "/include"))
-    (setq rime-librime-root
-     (shell-command-to-string
-      "nix eval --raw '(let pkgs = import <nixpkgs> {}; in with pkgs; lib.getLib librime)'"))
-    ;; (setq rime-share-data-dir
-    ;;  (concat
-    ;;   (shell-command-to-string
-    ;;    "nix eval --raw '(let pkgs = import <nixpkgs> {}; in with pkgs; lib.getLib brise)'")
-    ;;   "/share/rime-data"))
-    )
+     (file-truename (concat
+		(file-name-directory (directory-file-name (file-truename invocation-directory)))
+		"include")))
+    (setq rime-librime-root "/etc/profiles/per-user/moxian"))
   (defun +open-flypy ()
     (interactive)
     (set-input-method "rime"))

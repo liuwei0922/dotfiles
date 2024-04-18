@@ -13,6 +13,8 @@
   home.username = "moxian";
   home.homeDirectory = "/home/moxian";
 
+  #home.profileDirectory = "/home/moxian/.nix-profile";
+
   # 直接将当前文件夹的配置文件，链接到 Home 目录下的指定位置
   # home.file.".config/i3/wallpaper.jpg".source = ./wallpaper.jpg;
 
@@ -41,6 +43,7 @@
     # 如下是我常用的一些命令行工具，你可以根据自己的需要进行增删
     neofetch
     nnn # terminal file manager
+    gnome.adwaita-icon-theme
     gcc13
     gnumake
 
@@ -54,6 +57,22 @@
     unzip
     p7zip
 
+    gnused
+    gnutar
+    gawk
+    zstd
+    gnupg
+    # system call monitoring
+    strace # system call monitoring
+    ltrace # library call monitoring
+    lsof # list open files
+
+    # system tools
+    sysstat
+    lm_sensors # for `sensors` command
+    ethtool
+    pciutils # lspci
+    usbutils # lsusb
     # utils
     fd
     ripgrep # recursively searches directories for a regex pattern
@@ -74,7 +93,7 @@
 
     # misc
     #cowsay
-    nix-bash-completions
+    #nix-bash-completions
     
     # nix related
     #
@@ -96,6 +115,9 @@
     enable = true;
     userName = "qinmoxiao";
     userEmail = "qinmoxiao@qq.com";
+    extraConfig = {
+      https.proxy = "http://127.0.0.1:10809";
+    };
   };
 
   # 启用 starship，这是一个漂亮的 shell 提示符

@@ -8,13 +8,19 @@
     enable = true;
     defaultUser = "moxian";
     nativeSystemd = true;
-    interop.includePath = false;
+    #interop.includePath = false;
+    wslConf.interop.appendWindowsPath= false;
     # 创建软件的桌面快捷方式
-    #startMenuLaunchers = true;
+    startMenuLaunchers = true;
+    wslConf.user.default = "moxian";
   };
+
+  #users.users."moxian".shell = pkgs.bash;
+
 
   environment.systemPackages = with pkgs; [
     wsl-open
+    wslu
   ];
 
   system.stateVersion = "23.11";
