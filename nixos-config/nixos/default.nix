@@ -25,13 +25,10 @@
     which 
     file
     tree
+    util-linux
   ];
   
-  #users.users.moxian = {
-  #  isNormalUser = true;
-  #  description = "ryan";
-  #  extraGroups = [ "networkmanager" "wheel" ];
-  #};
+  
   time.timeZone = "Asia/Shanghai";
 
   environment.variables = {
@@ -40,18 +37,15 @@
     EDITOR = "vim";
   };
 
-  programs.bash = {
-    shellInit = ''export LANG=zh_CN.UTF-8; '';
-    interactiveShellInit= ''export LANG=zh_CN.UTF-8; '';
-  };
-  
   nixpkgs.config = {
     allowUnfree = true;
   };
-  #systemd.globalEnvironment = {
-  #  GDK_DPI_SCALE="2";
-  #  GDK_SCALE="0.5";
-  #};
+  systemd.globalEnvironment = {
+    #GDK_DPI_SCALE="2";
+    #GDK_SCALE="0.5";
+    LANG = "zh_CN.UTF-8";
+    LANGUAGE = "zh_CN.UTF-8";
+  };
   
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
@@ -59,5 +53,5 @@
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "23.11"; # Did you read the comment?
+  system.stateVersion = "24.05"; # Did you read the comment?
 }

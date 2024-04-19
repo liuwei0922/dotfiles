@@ -256,7 +256,7 @@
      (file-truename (concat
 		(file-name-directory (directory-file-name (file-truename invocation-directory)))
 		"include")))
-    (setq rime-librime-root "/etc/profiles/per-user/moxian"))
+    (setq rime-librime-root "~/.local/state/nix/profiles/home-manager/home-path"))
   (defun +open-flypy ()
     (interactive)
     (set-input-method "rime"))

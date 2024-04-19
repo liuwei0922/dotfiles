@@ -20,16 +20,16 @@
 
   inputs = {
     nixos-wsl = {
-      url = "github:nix-community/NixOS-WSL";
+      url = "github:nix-community/NixOS-WSL/main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     
     home-manager = {
-      url = "github:nix-community/home-manager/release-23.11";
+      url = "github:nix-community/home-manager/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     
-    nixpkgs.url="https://mirrors.ustc.edu.cn/nix-channels/nixos-23.11/nixexprs.tar.xz";
+    nixpkgs.url="https://mirrors.ustc.edu.cn/nix-channels/nixpkgs-unstable/nixexprs.tar.xz";
     #ssh-git-dotfiles = {
     #  url = "git+ssh://git@github.com:liuwei0922/dotfiles.git?shallow=1";
     #  flake = false;

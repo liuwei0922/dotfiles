@@ -4,16 +4,21 @@
     enable = true;
     enableCompletion = false;
     shellOptions= [];
-    #initExtra=''export LANG=zh_CN.UTF-8; '';
+    #initExtra=''exec bash'';
+    #logoutExtra="exit";
     # TODO 在这里添加你的自定义 bashrc 内容
-    #bashrcExtra = '''';
+    bashrcExtra = '' '';
     # export GDK_DPI_SCALE=2;    export GDK_SCALE=0.5;
     profileExtra = ''
     export LEDGER_FILE="~/org/account/account.journal";
     export PATH="$PATH:$HOME/bin:$HOME/.local/bin:$HOME/go/bin";
-'';
+    '';
   };
   
+  home.sessionVariables = {
+    LANG = "zh_CN.UTF-8";
+    LANGUAGE = "zh_CN.UTF-8";
+  };
   # TODO 设置一些别名方便使用，你可以根据自己的需要进行增删
   home.shellAliases = {
     la = "ls -a --color";

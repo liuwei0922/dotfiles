@@ -1,5 +1,5 @@
 #!/run/current-system/sw/bin/bash
-
+export PATH=/run/wrappers/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/home/moxian/.nix-profile/bin:/nix/profile/bin:/home/moxian/.local/state/nix/profile/bin:/etc/profiles/per-user/moxian/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin
 # This script starts emacs daemon if it is not running, opens whatever file
 # you pass in and changes the focus to emacs.  Without any arguments, it just
 # opens the current buffer or *scratch* if nothing else is open.  The following
@@ -37,9 +37,10 @@ change_focus() {
 # will start a server if not running
 test "$(visible_frames)" -eq "1" && change_focus
 
+#filepath=$(wslpath )
 #if [ "$(visible_frames)" -lt  "2" ]; then # need to create a frame
   # -c $@ with no args just opens the scratch buffer
-  emacsclient -n -c "$@" && change_focus
+  emacsclient -n -c "$(wslpath "$@")" && change_focus
 #else # there is already a visible frame besides the daemon, so
   #change_focus
   # -n $@ errors if there are no args

@@ -1,6 +1,7 @@
 {
   pkgs,
   config,
+  lib,
   ...
 }: {
   # 主要区别就是这个 wsl 模块
@@ -15,13 +16,30 @@
     wslConf.user.default = "moxian";
   };
 
-  #users.users."moxian".shell = pkgs.bash;
-
-
   environment.systemPackages = with pkgs; [
     wsl-open
     wslu
+    # (
+    #   let packages = with pkgs; [ bashInteractive ]; in
+    #   pkgs.runCommand "dev-shell" {
+    #     buildInputs=packages;
+    #     nativeBuildInputs = [ pkgs.makeWrapper ];
+    #   } ''
+    #   mkdir -p $out/bin/
+    #   ln -sf ${pkgs.bashInteractive}/bin/bash $out/bin/dev-shell
+    #   wrapProgram $out/bin/dev-shell --prefix PATH : ${pkgs.lib.makeBinPath packages}
+    # '' 
+    # )
   ];
 
-  system.stateVersion = "23.11";
+  users.users."moxian" = {
+    isNormalUser = true;
+    shell = pkgs.bashInteractive;
+  };
+
+  #environment.loginShellInit="exec bash";
+  #environment.extraInit=''exec bash'';
+
+
+  system.stateVersion = "24.05";
 }
