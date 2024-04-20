@@ -7,6 +7,11 @@
     recursive = true;   # 递归整个文件夹
   };
 
+  home.packages = with pkgs;[
+    librime
+    gnome.adwaita-icon-theme    
+  ];
+
   programs.emacs = {
     enable = true;
     package = pkgs.emacs29-pgtk;

@@ -43,12 +43,10 @@
     # 如下是我常用的一些命令行工具，你可以根据自己的需要进行增删
     neofetch
     nnn # terminal file manager
-    gnome.adwaita-icon-theme
     gcc13
     gnumake
+    just
 
-    #emacs29-pgtk
-    librime
     wl-clipboard
 
     # archives
