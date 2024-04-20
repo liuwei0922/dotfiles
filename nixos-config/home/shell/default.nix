@@ -2,12 +2,22 @@
 {
   programs.bash = {
     enable = true;
-    enableCompletion = false;
-    shellOptions= [];
+    enableCompletion = true;
+
+    #shellOptions= [];
     #initExtra=''exec bash'';
     #logoutExtra="exit";
     # TODO 在这里添加你的自定义 bashrc 内容
-    bashrcExtra = '' '';
+    # bashrcExtra = ''
+    
+    # tst0="$(pidof bash)";
+    # tst1="$(echo $tst0 |awk '{print $1}')";
+    # if [[ "$(ps -p $tst1 -o command=)" == "-bash" ]]; then
+    # exec bash
+    # fi
+    
+    # '';
+    bashrcExtra="";
     # export GDK_DPI_SCALE=2;    export GDK_SCALE=0.5;
     profileExtra = ''
     export LEDGER_FILE="~/org/account/account.journal";
@@ -20,6 +30,7 @@
     LANGUAGE = "zh_CN.UTF-8";
   };
   # TODO 设置一些别名方便使用，你可以根据自己的需要进行增删
+
   home.shellAliases = {
     la = "ls -a --color";
     ll = "ls -l --color";

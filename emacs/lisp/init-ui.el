@@ -242,7 +242,7 @@
   (rime-cursor "˰")
   (rime-disable-predicates
    '(rime-predicate-prog-in-code-p
-     rime-predicate-after-alphabet-char-p
+     ;;rime-predicate-after-alphabet-char-p
      ))
   (rime-inline-predicates
    '(rime-predicate-space-after-cc-p

@@ -36,7 +36,17 @@
     isNormalUser = true;
     shell = pkgs.bashInteractive;
   };
-
+  
+  # 控制中文不要乱码，因为只有第一次的 login shell 是会乱码的
+  programs.bash.loginShellInit =''
+    
+    tst0="$(pidof bash)";
+    tst1="$(echo $tst0 |awk '{print $1}')";
+    if [[ "$(ps -p $tst1 -o command=)" == "-bash" ]]; then
+    exec bash
+    fi
+    
+    '';
   #environment.loginShellInit="exec bash";
   #environment.extraInit=''exec bash'';
 

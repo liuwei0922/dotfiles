@@ -576,7 +576,7 @@ This function makes sure that dates are aligned for easy reading."
   :custom
   (citar-bibliography '("~/org/bibliography/references.bib"))
   (citar-notes-paths '("~/org/notes"))
-  (org-cite-global-bibliography citar-bibliography)
+  (org-cite-global-bibliography '("~/org/bibliography/references.bib"))
   (org-cite-insert-processor 'citar)
   (org-cite-follow-processor 'citar)
   (org-cite-activate-processor 'citar)
@@ -608,14 +608,14 @@ This function makes sure that dates are aligned for easy reading."
 
 (use-package biblio
   :ensure t
-  :after citar
+  :after org
   :custom
   (biblio-download-directory "~/org/bibtex-pdfs/")
   )
 
 (use-package ebib
   :ensure t
-  :after citar
+  :after org
   :custom
   (ebib-default-directory "~/org/bibliography/")
   (ebib-bib-search-dirs "~/org/bibliography/")
