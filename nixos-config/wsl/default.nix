@@ -47,6 +47,8 @@
     fi
     
     '';
+
+  
   #environment.loginShellInit="exec bash";
   #environment.extraInit=''exec bash'';
 

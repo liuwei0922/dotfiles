@@ -45,9 +45,12 @@
     nnn # terminal file manager
     gcc13
     gnumake
+    cmake 
     just
+    clang-tools
 
     wl-clipboard
+    mpv
 
     # archives
     zip
@@ -71,6 +74,7 @@
     ethtool
     pciutils # lspci
     usbutils # lsusb
+
     # utils
     fd
     ripgrep # recursively searches directories for a regex pattern
@@ -117,18 +121,6 @@
       https.proxy = "http://127.0.0.1:10809";
     };
   };
-
-  # 启用 starship，这是一个漂亮的 shell 提示符
-  #programs.starship = {
-  #  enable = false;
-  #  # 自定义配置
-  #  settings = {
-  #    add_newline = false;
-  #    aws.disabled = true;
-  #    gcloud.disabled = true;
-  #    line_break.disabled = true;
-  #  };
-  #};
 
 
   # This value determines the Home Manager release that your

@@ -259,7 +259,15 @@
 ;; M-x fanyi-dwim{,2}, that's all.
 (use-package fanyi
   :ensure t
-  :commands fanyi-dwim fanyi-dwim2)
+  :custom
+  (fanyi-providers '(;; 海词
+                     fanyi-haici-provider
+                     ;; 有道同义词词典
+                     fanyi-youdao-thesaurus-provider
+                     ;; Etymonline
+                     fanyi-etymon-provider
+                     ;; Longman
+                     fanyi-longman-provider)))
 
 
 ;; which-key

@@ -37,16 +37,31 @@
     EDITOR = "vim";
   };
 
-  nixpkgs.config = {
-    allowUnfree = true;
-  };
   systemd.globalEnvironment = {
     #GDK_DPI_SCALE="2";
     #GDK_SCALE="0.5";
     LANG = "zh_CN.UTF-8";
     LANGUAGE = "zh_CN.UTF-8";
   };
-  
+
+  nixpkgs.config = {
+    allowUnfree = true;
+  };
+
+  # do garbage collection weekly to keep disk usage low
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 1w";
+  };
+
+  # Optimise storage
+  # you can also optimise the store manually via:
+  #    nix-store --optimise
+  # https://nixos.org/manual/nix/stable/command-ref/conf-file.html#conf-auto-optimise-store
+  nix.settings.auto-optimise-store = true;
+
+  security.sudo.enable = true;
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It's perfectly fine and recommended to leave

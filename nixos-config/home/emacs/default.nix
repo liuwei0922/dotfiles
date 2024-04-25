@@ -24,7 +24,7 @@
   };
 
   systemd.user.services.emacs.Service = {
-    Environment="GDK_DPI_SCALE=2 GDK_SCALE=0.5";
+    Environment="GDK_DPI_SCALE=2 GDK_SCALE=0.5 PATH=/bin";
   };
 
 }

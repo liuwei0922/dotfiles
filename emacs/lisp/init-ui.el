@@ -98,9 +98,9 @@
 ;; 在菜单中添加最近编辑过的文件选项
 (use-package recentf
   :config
-  ;;(setq recentf-save-file "~/.emacs.d/recentf")
+  (setq recentf-save-file "~/.emacs.d/recentf")
   ;; 不自动清理 recentf 记录。
-  ;;(setq recentf-auto-cleanup 'never)
+  (setq recentf-auto-cleanup 'never)
   ;; emacs 退出时清理 recentf 记录。
   ;;(add-hook 'kill-emacs-hook #'recentf-cleanup)
   ;; 每 5min 以及 emacs 退出时保存 recentf-list。
