@@ -98,16 +98,16 @@
 ;; 在菜单中添加最近编辑过的文件选项
 (use-package recentf
   :config
-  (setq recentf-save-file "~/.emacs.d/recentf")
+  (setq recentf-save-file (concat user-emacs-directory "recentf"))
   ;; 不自动清理 recentf 记录。
   (setq recentf-auto-cleanup 'never)
   ;; emacs 退出时清理 recentf 记录。
   ;;(add-hook 'kill-emacs-hook #'recentf-cleanup)
   ;; 每 5min 以及 emacs 退出时保存 recentf-list。
-  ;;(run-at-time nil (* 5 60) 'recentf-save-list)
-  ;;(add-hook 'kill-emacs-hook #'recentf-save-list)
-  ;;(setq recentf-max-menu-items 100)
-  ;;(setq recentf-max-saved-items 200) ;; default 20
+  (run-at-time nil (* 5 60) 'recentf-save-list)
+  (add-hook 'kill-emacs-hook #'recentf-save-list)
+  (setq recentf-max-menu-items 100)
+  (setq recentf-max-saved-items 200) ;; default 20
   ;; recentf-exclude 的参数是正则表达式列表，不支持 ~ 引用家目录。
   ;; emacs-dashboard 不显示这里排除的文件。  
   (setq recentf-exclude `(,(recentf-expand-file-name "~\\(straight\\|ln-cache\\|etc\\|var\\|.cache\\|backup\\|elfeed\\)/.*")
@@ -210,6 +210,54 @@
 ;;     (nerd-icons-install-fonts t))
 ;;   )
 
+(use-package kind-icon
+  :ensure t
+  :after corfu
+  ;; :custom
+  ;; (kind-icon-blend-background t)
+  ;; (kind-icon-default-face 'corfu-default) ; only needed with blend-background
+  :config
+  (setq kind-icon-mapping
+	'((array "a" :icon "symbol-array" :face font-lock-type-face :collection "vscode")
+          (boolean "b" :icon "symbol-boolean" :face font-lock-builtin-face :collection "vscode")
+          (color "#" :icon "symbol-color"  :face success :collection "vscode")
+          (command "cm"  :icon "chevron-right" :face default :collection "vscode")
+          (constant "co"  :icon "symbol-constant" :face font-lock-constant-face :collection "vscode")
+          (class "c"   :icon "symbol-class" :face font-lock-type-face :collection "vscode")
+          (constructor "cn"  :icon "symbol-method" :face font-lock-function-name-face :collection "vscode")
+          (enum "e"   :icon "symbol-enum" :face font-lock-builtin-face :collection "vscode")
+          (enummember     "em"  :icon "symbol-enum-member" :face font-lock-builtin-face :collection "vscode")
+          (enum-member    "em"  :icon "symbol-enum-member" :face font-lock-builtin-face :collection "vscode")
+          (event          "ev"  :icon "symbol-event"       :face font-lock-warning-face :collection "vscode")
+          (field "fd"  :icon "symbol-field" :face font-lock-variable-name-face :collection "vscode")
+          (file  "f"   :icon "symbol-file"        :face font-lock-string-face  :collection "vscode")
+          (folder         "d"   :icon "folder"             :face font-lock-doc-face :collection "vscode")
+          (function  "f"   :icon "symbol-method"      :face font-lock-function-name-face :collection "vscode")
+          (interface      "if"  :icon "symbol-interface"   :face font-lock-type-face  :collection "vscode")
+          (keyword        "kw"  :icon "symbol-keyword"     :face font-lock-keyword-face :collection "vscode")
+          (macro          "mc"  :icon "lambda"             :face font-lock-keyword-face)
+          (magic          "ma"  :icon "lightbulb-autofix"  :face font-lock-builtin-face :collection "vscode")
+          (method "m"   :icon "symbol-method"      :face font-lock-function-name-face  :collection "vscode")
+          (module         "{"   :icon "file-code-outline"  :face font-lock-preprocessor-face)
+          (numeric        "nu"  :icon "symbol-numeric"     :face font-lock-builtin-face :collection "vscode")
+          (operator "op"  :icon "symbol-operator" :face font-lock-comment-delimiter-face :collection "vscode")
+          (param          "pa"  :icon "gear"               :face default :collection "vscode")
+          (property "pr" :icon "symbol-property" :face font-lock-variable-name-face :collection "vscode")
+          (reference "rf"  :icon "library"  :face font-lock-variable-name-face     :collection "vscode")
+          (snippet        "S"   :icon "symbol-snippet"     :face font-lock-string-face :collection "vscode")
+          (string         "s"   :icon "symbol-string"      :face font-lock-string-face :collection "vscode")
+          (struct "%" :icon "symbol-structure" :face font-lock-variable-name-face :collection "vscode")
+          (text  "tx"  :icon "symbol-key"         :face font-lock-doc-face      :collection "vscode")
+          (typeparameter  "tp"  :icon "symbol-parameter"   :face font-lock-type-face  :collection "vscode")
+          (type-parameter "tp"  :icon "symbol-parameter"   :face font-lock-type-face  :collection "vscode")
+          (unit           "u"   :icon "symbol-ruler"       :face font-lock-constant-face :collection "vscode")
+          (value          "v"   :icon "symbol-enum"        :face font-lock-builtin-face  :collection "vscode")
+          (variable "va" :icon "symbol-variable" :face font-lock-variable-name-face     :collection "vscode")
+          (t              "."   :icon "question"           :face font-lock-warning-fac :collection "vscode")))
+  (when (eq +system-type 'wsl)
+    (plist-put kind-icon-default-style :height 0.4))
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+
 
 ;; 启动时关闭系统输入法
 (when (eq system-type 'windows-nt)
@@ -242,6 +290,9 @@
   (rime-cursor "˰")
   (rime-disable-predicates
    '(rime-predicate-prog-in-code-p
+     rime-predicate-punctuation-after-ascii-p
+     rime-predicate-current-uppercase-letter-p
+     rime-predicate-after-ascii-char-p
      ;;rime-predicate-after-alphabet-char-p
      ))
   (rime-inline-predicates

@@ -80,8 +80,8 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1713266145,
-        "narHash": "sha256-yWPc+qjB8ZzzWXmwbMVsqVvHgw2jywZrglgyt0NU1D0=",
+        "lastModified": 315532800,
+        "narHash": "sha256-xAYMA+tkfYN03YMoV2Es80rnmBl1o8TwugO8jpR5SF0=",
         "type": "tarball",
         "url": "https://mirrors.ustc.edu.cn/nix-channels/nixpkgs-unstable/nixexprs.tar.xz"
       },

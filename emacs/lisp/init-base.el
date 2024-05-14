@@ -265,9 +265,10 @@
                      ;; 有道同义词词典
                      fanyi-youdao-thesaurus-provider
                      ;; Etymonline
-                     fanyi-etymon-provider
+                     ;;fanyi-etymon-provider
                      ;; Longman
-                     fanyi-longman-provider)))
+                     ;;fanyi-longman-provider
+		     )))
 
 
 ;; which-key

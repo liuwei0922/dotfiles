@@ -13,9 +13,25 @@
     #<nixos-wsl/modules>
   ];
 
+  # the nixConfig here only affects the flake itself, not the system configuration!
+  #nixConfig = {
+  #  # override the default substituters
+  #  substituters = [
+  #    # cache mirror located in China
+  #    # status: https://mirror.sjtu.edu.cn/
+  #    "https://mirror.sjtu.edu.cn/nix-channels/store"
+  #    # status: https://mirrors.ustc.edu.cn/status/
+  #    #"https://mirrors.ustc.edu.cn/nix-channels/store"
+  #    "https://cache.nixos.org"
+  #    # nix community's cache server
+  #    "https://nix-community.cachix.org"
+  #  ];
+  #};
+
   # 启用 Flakes 特性以及配套的船新 nix 命令行工具
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.settings.trusted-users=["moxian"];
+  nix.settings.substituters = [ "https://mirrors.ustc.edu.cn/nix-channels/store" ];
   environment.systemPackages = with pkgs; [
     # Flakes 通过 git 命令拉取其依赖项，所以必须先安装好 git
     git

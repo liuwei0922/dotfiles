@@ -1,23 +1,6 @@
 {
   description = "A simple NixOS flake";
 
-  # the nixConfig here only affects the flake itself, not the system configuration!
-  #nixConfig = {
-  #  # override the default substituters
-  #  substituters = [
-  #    # cache mirror located in China
-  #    # status: https://mirror.sjtu.edu.cn/
-  #    "https://mirror.sjtu.edu.cn/nix-channels/store"
-  #    # status: https://mirrors.ustc.edu.cn/status/
-  #    #"https://mirrors.ustc.edu.cn/nix-channels/store"
-  #    "https://cache.nixos.org"
-  #    # nix community's cache server
-  #    "https://nix-community.cachix.org"
-  #  ];
-  #};
-
-
-
   inputs = {
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL/main";
@@ -30,10 +13,6 @@
     };
     
     nixpkgs.url="https://mirrors.ustc.edu.cn/nix-channels/nixpkgs-unstable/nixexprs.tar.xz";
-    #ssh-git-dotfiles = {
-    #  url = "git+ssh://git@github.com:liuwei0922/dotfiles.git?shallow=1";
-    #  flake = false;
-    #};
   };
 
   outputs = { self,nixpkgs,nixos-wsl,home-manager,... }@inputs: {
