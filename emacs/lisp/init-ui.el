@@ -290,13 +290,13 @@
   (rime-cursor "˰")
   (rime-disable-predicates
    '(rime-predicate-prog-in-code-p
-     rime-predicate-punctuation-after-ascii-p
-     rime-predicate-current-uppercase-letter-p
-     rime-predicate-after-ascii-char-p
+     ;;rime-predicate-punctuation-after-ascii-p
+     ;;rime-predicate-current-uppercase-letter-p     
      ;;rime-predicate-after-alphabet-char-p
      ))
   (rime-inline-predicates
    '(rime-predicate-space-after-cc-p
+     rime-predicate-after-ascii-char-p
      ))
   :bind
   (:map rime-mode-map
