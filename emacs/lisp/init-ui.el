@@ -301,6 +301,8 @@
   :bind
   (:map rime-mode-map
    ("M-j" . rime-force-enable))
+  :hook
+  (kill-emacs . rime-lib-finalize)
   :config
   (when (eq +linux-type 'nixos)
     (setq rime-emacs-module-header-root
