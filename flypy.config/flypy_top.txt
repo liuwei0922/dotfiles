@@ -14,7 +14,7 @@
 #
 # 同文	tw	90
 # 提问	tw	30
-#
+# 
 # 如只加一个用户词，则无需权重，如下（如想居于系统词“台湾”后，请把词条放到flypy_user文件内）：
 #
 # 同文	tw
@@ -66,56 +66,9 @@
 (	;e	100
 )	;r	100
 *	;k	100
-# void 	void	100
-# int 	int	100
-# char 	char	100
-# unsigned 	usg	100
 !	;a	90
 *	;kk
 .	;y	100
 .	;yy
-# main 	main	100
-# include 	incl	100
 小时	xnui	100
 边界	bmjp	100
-# 复数	fuuu	100
-# 放置	fhvi	100
-# 虚数	xuuu	100
-# 向量	xlll	100
-# 极坐标	jzbn	100
-# 复变函数	fbhu	100
-# 柯西	kexi	100
-# 她们	tamf
-# 端点	drdm	100
-# 它们	tm
-# 连通	lmts	100
-# 相交	xljn	100
-# 常量	ihll	100
-# 总和	zshe
-# 定理	dkli	100
-# 奇点	jidm	100
-# 邻域	lbyu	100
-# 微分	wwff	100
-# 称作	igzo	100
-# 质点	vidm	100
-# 常数	ihuu	100
-# 法线	faxm	100
-# 位移	wwyi	100
-# 力矩	liju	100
-# 动量	dsll	100
-# 直角	vijn	100
-# 引力	ybli	100
-# 代入	ddru	100
-# 质心	vixb	100
-# 几何	jihe	100
-# 矢量	uill	100
-# 蒋介石	jju	100
-# 程度	igdu	100
-# 统治	tsvi	100
-# 事实	uiui	100
-# 级数	jiuu	100
-# 高亮	gcll	100
-# 以外	yiw	100
-# 互助	huvu	100
-# 主人	vurf	100
-# 给予	jiyu	100
