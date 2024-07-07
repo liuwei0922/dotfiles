@@ -115,7 +115,7 @@
           ("apple-keyboard-command" tool-bar-item-ctrl apple-keyboard-command ,map)
           ("apple-keyboard-option" tool-bar-item-alt apple-keyboard-option ,map)
 
-          ;;("arrow-down-bold" scroll-up arrow-down-bold ,map)\
+          ;;("arrow-down-bold" scroll-up arrow-down-bold ,map)
           ("arrow-up-thin" tool-bar-item-up arrow-up-thin ,map)
 	  ("menu" execute-extended-command menu ,map)          
           ;;("arrow-up-bold" scroll-down arrow-up-bold ,map)
@@ -136,8 +136,10 @@
           ("content-copy" kill-ring-save content-copy ,map)
           ("content-paste" yank content-paste ,map)
           ("selection" er/expand-region selection ,map)
-	  ("keyboard-off" android-toggle-keyboard android-toggle-keyboard ,map))
-)
+	  ("keyboard-off" android-toggle-keyboard android-toggle-keyboard ,map)
+	  )
+	)
+  )
 
 (define-key key-translation-map
             [tool-bar apple-keyboard-command]
@@ -170,53 +172,53 @@
 
 
 ;;; org-mode 
-;; (use-package! org
-;;   :hook
-;;   (
-;;    (org-mode . (lambda () (setq truncate-lines nil)))  
-;;    (org-mode . (lambda () (display-line-numbers-mode -1)))
-;;    (org-mode . (lambda ()
-;; 		 ;; 设置折行
-;; 		 (global-word-wrap-whitespace-mode 1)))
-;;    ;; 设置 ORG 标题样式
-;;    ;;(org-cycle-tab-first . +org-cycle-only-current-subtree-h)
-;;    )
-;;   :custom
-;;   (org-default-notes-file (expand-file-name "notes.org" org-directory))
-;;   ;; 整体美化相关设置
-;;   ;;(org-ellipsis "⤵")
-;;   (org-fontify-todo-headline nil)
-;;   (org-fontify-done-headline t)
-;;   (org-fontify-whole-heading-line t)
-;;   (org-fontify-quote-and-verse-blocks t)
-;;   (org-list-demote-modify-bullet '(("+" . "-") ("1." . "a.") ("-" . "+")))
-;;   ;; 设置 ORG 标题范围，使上面的尾标可以正确显示
-;;   (org-cycle-separator-lines 2)
-;;   ;; 上下标控制
-;;   (org-export-with-sub-superscripts '{})
-;;   (org-use-sub-superscripts '{})
-;;   (org-use-sub-superscripts '{})
-;;   (org-hide-emphasis-markers t)
-;;   (org-pretty-entities t)
-;;   ;; org 中图片大小
-;;   (org-image-actual-width nil)
-;;   ;; 其他设置
-;;   (org-imenu-depth 4)
-;;   (org-clone-delete-id t)
-;;   (org-use-sub-superscripts '{})
-;;   (org-yank-adjusted-subtrees t)
-;;   (org-ctrl-k-protect-subtree 'error)
-;;   (org-fold-catch-invisible-edits 'show-and-error)
-;;   (org-return-follows-link nil)
-;;   ;; 启动时缩进
-;;   (org-startup-indented t)
-;;   ;; 启动时折叠内容
-;;   (org-startup-folded t)
-;;   ;; TODO 结束时加上时间
-;;   (org-log-done 'time)
-;;   ;; TODO 设置
-;;   (org-todo-keywords '((sequence "TODO(t)"
-;; 				 "DOING(i!)"
+(use-package! org
+  :hook
+  (
+   (org-mode . (lambda () (setq truncate-lines nil)))  
+   (org-mode . (lambda () (display-line-numbers-mode -1)))
+   (org-mode . (lambda ()
+		 ;; 设置折行
+		 (global-word-wrap-whitespace-mode 1)))
+   ;; 设置 ORG 标题样式
+   ;;(org-cycle-tab-first . +org-cycle-only-current-subtree-h)
+   )
+  :custom
+  (org-default-notes-file (expand-file-name "notes.org" org-directory))
+  ;; 整体美化相关设置
+  ;;(org-ellipsis "⤵")
+  (org-fontify-todo-headline nil)
+  (org-fontify-done-headline t)
+  (org-fontify-whole-heading-line t)
+  (org-fontify-quote-and-verse-blocks t)
+  (org-list-demote-modify-bullet '(("+" . "-") ("1." . "a.") ("-" . "+")))
+  ;; 设置 ORG 标题范围，使上面的尾标可以正确显示
+  (org-cycle-separator-lines 2)
+  ;; 上下标控制
+  (org-export-with-sub-superscripts '{})
+  (org-use-sub-superscripts '{})
+  (org-use-sub-superscripts '{})
+  (org-hide-emphasis-markers t)
+  (org-pretty-entities t)
+  ;; org 中图片大小
+  (org-image-actual-width nil)
+  ;; 其他设置
+  (org-imenu-depth 4)
+  (org-clone-delete-id t)
+  (org-use-sub-superscripts '{})
+  (org-yank-adjusted-subtrees t)
+  (org-ctrl-k-protect-subtree 'error)
+  (org-fold-catch-invisible-edits 'show-and-error)
+  (org-return-follows-link nil)
+  ;; 启动时缩进
+  (org-startup-indented t)
+  ;; 启动时折叠内容
+  (org-startup-folded t)
+  ;; TODO 结束时加上时间
+  (org-log-done 'time)
+  ;; TODO 设置
+  (org-todo-keywords '((sequence "TODO(t)"
+				 "DOING(i!)"
 ;; 				 "|"
 ;; 				 "DONE(d!)"
 ;; 				 "KILLED(k!)")))
