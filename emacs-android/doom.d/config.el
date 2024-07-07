@@ -278,4 +278,6 @@ with `org-cycle')."
   )
 
 ;;; UI Setting
-(visual-line-mode -1)
+(add-hook 'after-init-hook
+ (lambda ()
+   (visual-line-mode -1)))
