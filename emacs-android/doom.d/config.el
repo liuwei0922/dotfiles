@@ -179,7 +179,7 @@
 		 ;; 设置折行
 		 (global-word-wrap-whitespace-mode 1)))
    ;; 设置 ORG 标题样式
-   (org-cycle-tab-first . +org-cycle-only-current-subtree-h)
+   ;;(org-cycle-tab-first . +org-cycle-only-current-subtree-h)
    )
   :custom
   (org-default-notes-file (expand-file-name "notes.org" org-directory))
