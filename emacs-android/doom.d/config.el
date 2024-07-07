@@ -175,7 +175,8 @@
 (use-package org
   :hook
   (
-   (org-mode . (lambda () (setq-local truncate-lines nil)))  
+   ;;(org-mode . (lambda () (setq-local truncate-lines nil)))
+   (org-mode . (lambda () (visual-line-mode -1)))
    (org-mode . (lambda () (display-line-numbers-mode -1)))
    ;; (org-mode . (lambda ()
    ;; 		 ;; 设置折行
