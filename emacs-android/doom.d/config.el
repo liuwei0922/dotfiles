@@ -172,7 +172,7 @@
 
 
 ;;; org-mode 
-(use-package! org
+(use-package org
   :hook
   (
    (org-mode . (lambda () (setq truncate-lines nil)))  
