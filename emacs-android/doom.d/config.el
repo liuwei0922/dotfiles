@@ -183,81 +183,6 @@
    ;; 设置 ORG 标题样式
    (org-cycle-tab-first . +org-cycle-only-current-subtree-h)
    )
-  :custom
-  (org-default-notes-file (expand-file-name "notes.org" org-directory))
-  ;; 整体美化相关设置
-  ;;(org-ellipsis "⤵")
-  (org-fontify-todo-headline nil)
-  (org-fontify-done-headline t)
-  (org-fontify-whole-heading-line t)
-  (org-fontify-quote-and-verse-blocks t)
-  (org-list-demote-modify-bullet '(("+" . "-") ("1." . "a.") ("-" . "+")))
-  ;; 设置 ORG 标题范围，使上面的尾标可以正确显示
-  (org-cycle-separator-lines 2)
-  ;; 上下标控制
-  (org-export-with-sub-superscripts '{})
-  (org-use-sub-superscripts '{})
-  (org-use-sub-superscripts '{})
-  (org-hide-emphasis-markers t)
-  (org-pretty-entities t)
-  ;; org 中图片大小
-  (org-image-actual-width nil)
-  ;; 其他设置
-  (org-imenu-depth 4)
-  (org-clone-delete-id t)
-  (org-use-sub-superscripts '{})
-  (org-yank-adjusted-subtrees t)
-  (org-ctrl-k-protect-subtree 'error)
-  (org-fold-catch-invisible-edits 'show-and-error)
-  (org-return-follows-link nil)
-  ;; 启动时缩进
-  (org-startup-indented t)
-  ;; 启动时折叠内容
-  (org-startup-folded t)
-  ;; TODO 结束时加上时间
-  (org-log-done 'time)
-  ;; TODO 设置
-  (org-todo-keywords '((sequence "TODO(t)"
-				 "DOING(i!)"
-				 "|"
-				 "DONE(d!)"
-				 "KILLED(k!)")))
-  (org-todo-keyword-faces '(("DONE"       :foreground "#7c7c75" :weight bold)
-                            ("DOING"       :foreground "#feb24c" :weight bold)
-                            ("TODO"       :foreground "#50a14f" :weight bold)
-                            ("KILLED"  :foreground "#ff6480" :weight bold)))
-  ;; 时间戳格式
-  (org-time-stamp-formats '("<%Y-%m-%d %A>" . "<%Y-%m-%d %A %H:%M>"))
-  (org-use-fast-todo-selection 'expert)
-  (org-enforce-todo-dependencies t)
-  (org-enforce-todo-checkbox-dependencies t)
-  (org-priority-faces '((?A :foreground "red")
-                        (?B :foreground "orange")
-                        (?C :foreground "yellow")))
-  (org-columns-default-format "%25ITEM %TODO %3PRIORITY %TAGS %CLOCKSUM")
-  ;; Remove CLOSED: [timestamp] after switching to non-DONE states
-  (org-closed-keep-when-no-todo t)
-  ;; refile
-  (org-refile-use-cache nil)
-  (org-refile-targets '((org-agenda-files . (:maxlevel . 6))))
-  (org-refile-use-outline-path 'file)
-  (org-outline-path-complete-in-steps nil)
-  (org-refile-allow-creating-parent-nodes 'confirm)
-  ;; tags, e.g. #+TAGS: keyword in your file
-  (org-use-fast-tag-selection t)
-  (org-fast-tag-selection-single-key t)
-  ;; id
-  (org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)
-  ;; abbreviation for url
-  (org-link-abbrev-alist '(("GitHub" . "https://github.com/")
-                           ("GitLab" . "https://gitlab.com/")
-                           ("Google" . "https://google.com/search?q=")
-                           ("RFCs"   . "https://tools.ietf.org/html/")
-                           ("LWN"    . "https://lwn.net/Articles/")
-                           ("WG21"   . "https://wg21.link/")
-			   ("bilibili" . "https://www.bilibili.com/video/%s")
-			   ("mengbai" . "https://mzh.moegirl.org.cn/zh-hans/%s")
-			   ("handian" . "https://www.zdic.net/hans/%s")))
   :config
   (defun +org-cycle-only-current-subtree-h (&optional arg)
     "Toggle the local fold at the point (as opposed to cycling through all levels
@@ -276,6 +201,80 @@ with `org-cycle')."
               (setq org-cycle-subtree-status 'subtree))
             (org-cycle-internal-local)
             t)))))
+  (setq org-default-notes-file (expand-file-name "notes.org" org-directory))
+  ;; 整体美化相关设置
+  ;;(org-ellipsis "⤵")
+  (setq org-fontify-todo-headline nil)
+  (setq org-fontify-done-headline t)
+  (setq org-fontify-whole-heading-line t)
+  (setq org-fontify-quote-and-verse-blocks t)
+  (setq org-list-demote-modify-bullet '(("+" . "-") ("1." . "a.") ("-" . "+")))
+  ;; 设置 ORG 标题范围，使上面的尾标可以正确显示
+  (setq org-cycle-separator-lines 2)
+  ;; 上下标控制
+  (setq org-export-with-sub-superscripts '{})
+  (setq org-use-sub-superscripts '{})
+  (setq org-use-sub-superscripts '{})
+  (setq org-hide-emphasis-markers t)
+  (setq org-pretty-entities t)
+  ;; org 中图片大小
+  (setq org-image-actual-width nil)
+  ;; 其他设置
+  (setq org-imenu-depth 4)
+  (setq org-clone-delete-id t)
+  (setq org-use-sub-superscripts '{})
+  (setq org-yank-adjusted-subtrees t)
+  (setq org-ctrl-k-protect-subtree 'error)
+  (setq org-fold-catch-invisible-edits 'show-and-error)
+  (setq org-return-follows-link nil)
+  ;; 启动时缩进
+  (setq org-startup-indented t)
+  ;; 启动时折叠内容
+  (setq org-startup-folded t)
+  ;; TODO 结束时加上时间
+  (setq org-log-done 'time)
+  ;; TODO 设置
+  (setq org-todo-keywords '((sequence "TODO(t)"
+				 "DOING(i!)"
+				 "|"
+				 "DONE(d!)"
+				 "KILLED(k!)")))
+  (setq org-todo-keyword-faces '(("DONE"       :foreground "#7c7c75" :weight bold)
+                            ("DOING"       :foreground "#feb24c" :weight bold)
+                            ("TODO"       :foreground "#50a14f" :weight bold)
+                            ("KILLED"  :foreground "#ff6480" :weight bold)))
+  ;; 时间戳格式
+  (setq org-time-stamp-formats '("<%Y-%m-%d %A>" . "<%Y-%m-%d %A %H:%M>"))
+  (setq org-use-fast-todo-selection 'expert)
+  (setq org-enforce-todo-dependencies t)
+  (setq org-enforce-todo-checkbox-dependencies t)
+  (setq org-priority-faces '((?A :foreground "red")
+                        (?B :foreground "orange")
+                        (?C :foreground "yellow")))
+  (setq org-columns-default-format "%25ITEM %TODO %3PRIORITY %TAGS %CLOCKSUM")
+  ;; Remove CLOSED: [timestamp] after switching to non-DONE states
+  (setq org-closed-keep-when-no-todo t)
+  ;; refile
+  (setq org-refile-use-cache nil)
+  (setq org-refile-targets '((org-agenda-files . (:maxlevel . 6))))
+  (setq org-refile-use-outline-path 'file)
+  (setq org-outline-path-complete-in-steps nil)
+  (setq org-refile-allow-creating-parent-nodes 'confirm)
+  ;; tags, e.g. #+TAGS: keyword in your file
+  (setq org-use-fast-tag-selection t)
+  (setq org-fast-tag-selection-single-key t)
+  ;; id
+  (setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)
+  ;; abbreviation for url
+  (setq org-link-abbrev-alist '(("GitHub" . "https://github.com/")
+                           ("GitLab" . "https://gitlab.com/")
+                           ("Google" . "https://google.com/search?q=")
+                           ("RFCs"   . "https://tools.ietf.org/html/")
+                           ("LWN"    . "https://lwn.net/Articles/")
+                           ("WG21"   . "https://wg21.link/")
+			   ("bilibili" . "https://www.bilibili.com/video/%s")
+			   ("mengbai" . "https://mzh.moegirl.org.cn/zh-hans/%s")
+			   ("handian" . "https://www.zdic.net/hans/%s")))
   )
 
 ;;; UI Setting
