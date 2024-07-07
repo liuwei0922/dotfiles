@@ -175,11 +175,11 @@
 (use-package org
   :hook
   (
-   (org-mode . (lambda () (setq truncate-lines nil)))  
+   (org-mode . (lambda () (setq-local truncate-lines nil)))  
    (org-mode . (lambda () (display-line-numbers-mode -1)))
-   (org-mode . (lambda ()
-		 ;; 设置折行
-		 (global-word-wrap-whitespace-mode 1)))
+   ;; (org-mode . (lambda ()
+   ;; 		 ;; 设置折行
+   ;; 		 (global-word-wrap-whitespace-mode 1)))
    ;; 设置 ORG 标题样式
    (org-cycle-tab-first . +org-cycle-only-current-subtree-h)
    )
@@ -278,4 +278,4 @@ with `org-cycle')."
   )
 
 ;;; UI Setting
-
+(setq visual-line-mode nil)
