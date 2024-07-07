@@ -278,4 +278,4 @@ with `org-cycle')."
   )
 
 ;;; UI Setting
-(setq visual-line-mode nil)
+(visual-line-mode -1)
