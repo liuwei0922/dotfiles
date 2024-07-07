@@ -116,8 +116,8 @@
           ("apple-keyboard-option" tool-bar-item-alt apple-keyboard-option ,map)
 
           ;;("arrow-down-bold" scroll-up arrow-down-bold ,map)\
-          ("menu" execute-extended-command menu ,map)
           ("arrow-up-thin" tool-bar-item-up arrow-up-thin ,map)
+	  ("menu" execute-extended-command menu ,map)          
           ;;("arrow-up-bold" scroll-down arrow-up-bold ,map)
           ("pen-plus" switch-to-buffer mark ,map)
 
@@ -128,8 +128,7 @@
           
           ("transfer-left" tool-bar-item-cg quit ,map)
           ("keyboard-tab" tool-bar-item-tab keyboard-tab ,map)
-          ("keyboard-off" android-toggle-keyboard android-toggle-keyboard ,map)
-          ("arrow-left-thin" tool-bar-item-left arrow-left-thin ,map)
+	  ("arrow-left-thin" tool-bar-item-left arrow-left-thin ,map)
           ("arrow-down-thin" tool-bar-item-down arrow-down-thin ,map)
           ("arrow-right-thin" tool-bar-item-right arrow-right-thin ,map)
 
@@ -137,8 +136,7 @@
           ("content-copy" kill-ring-save content-copy ,map)
           ("content-paste" yank content-paste ,map)
           ("selection" er/expand-region selection ,map)
-          )
-  )
+	  ("keyboard-off" android-toggle-keyboard android-toggle-keyboard ,map))
 )
 
 (define-key key-translation-map
@@ -173,17 +171,6 @@
 
 ;;; org-mode 
 (use-package! org
-  :bind (:map org-mode-map
-	      ("C-C a" . org-agenda)
-	      ("C-'" . nil)
-	      ("M-l" . org-metaright)
-	      ("M-h" . org-metaleft)
-	      ("M-H" . org-shiftmetaleft)
-	      ("M-L" . org-shiftmetaright)
-	      ("M-=" . advance-words-count)
-	      :map global-map
-	      ("C-c n c" . org-capture)
-	      )
   :hook
   (
    (org-mode . (lambda () (setq truncate-lines nil)))  
@@ -191,12 +178,13 @@
    (org-mode . (lambda ()
 		 ;; 设置折行
 		 (global-word-wrap-whitespace-mode 1)))
+   ;; 设置 ORG 标题样式
+   (org-cycle-tab-first . +org-cycle-only-current-subtree-h)
    )
   :custom
-    (org-default-notes-file (expand-file-name "notes.org" org-directory))
+  (org-default-notes-file (expand-file-name "notes.org" org-directory))
   ;; 整体美化相关设置
   ;;(org-ellipsis "⤵")
-  (org-startup-indented t)
   (org-fontify-todo-headline nil)
   (org-fontify-done-headline t)
   (org-fontify-whole-heading-line t)
@@ -268,6 +256,24 @@
 			   ("bilibili" . "https://www.bilibili.com/video/%s")
 			   ("mengbai" . "https://mzh.moegirl.org.cn/zh-hans/%s")
 			   ("handian" . "https://www.zdic.net/hans/%s")))
+  :config
+  (defun +org-cycle-only-current-subtree-h (&optional arg)
+    "Toggle the local fold at the point (as opposed to cycling through all levels
+with `org-cycle')."
+    (interactive "P")
+    (unless (eq this-command 'org-shifttab)
+      (save-excursion
+	(org-beginning-of-line)
+	(let (invisible-p)
+          (when (and (org-at-heading-p)
+                     (or org-cycle-open-archived-trees
+			 (not (member org-archive-tag (org-get-tags))))
+                     (or (not arg)
+			 (setq invisible-p (outline-invisible-p (line-end-position)))))
+            (unless invisible-p
+              (setq org-cycle-subtree-status 'subtree))
+            (org-cycle-internal-local)
+            t)))))
   )
 
 ;;; UI Setting
