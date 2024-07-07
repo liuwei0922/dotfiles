@@ -74,3 +74,201 @@
 ;;
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
+
+;;; tool-bar mode
+(tool-bar-mode 1)
+
+(defun android-toggle-keyboard ()
+  (interactive)
+  (if touch-screen-display-keyboard
+      (progn
+        (setq touch-screen-display-keyboard nil)
+        (tool-bar-add-item
+         "keyboard-off" 'android-toggle-keyboard
+         'android-toggle-keyboard
+         :help "Toggle Keyboard")
+        (message "Disable virtual keyboard"))
+    (setq touch-screen-display-keyboard t)
+    (tool-bar-add-item
+     "keyboard" 'android-toggle-keyboard
+     'android-toggle-keyboard
+     :help "Toggle keyboard")
+    (message "Enable virtual keyboard")))
+
+(defun android-tool-bar-configs ()
+  (when (and (fboundp 'tool-bar-mode)
+             (string-equal system-type "android"))
+    (tool-bar-mode +1)
+    (setq! tool-bar-position 'bottom)
+    (setq! tool-bar-button-margin 27)
+    (setq tool-bar-map '(keymap nil))
+    (add-to-list 'image-load-path
+                 (expand-file-name
+                  "module/tool-bar" doom-private-dir))
+    (android-general-tool-bar
+     'tool-bar-add-item nil)))
+
+(defun android-general-tool-bar (fn map)
+  (mapc (lambda (args)
+          (apply fn args))
+        `(("keyboard-esc" tool-bar-item-escape  keyboard-esc ,map)
+          ("apple-keyboard-command" tool-bar-item-ctrl apple-keyboard-command ,map)
+          ("apple-keyboard-option" tool-bar-item-alt apple-keyboard-option ,map)
+
+          ;;("arrow-down-bold" scroll-up arrow-down-bold ,map)\
+          ("menu" execute-extended-command menu ,map)
+          ("arrow-up-thin" tool-bar-item-up arrow-up-thin ,map)
+          ;;("arrow-up-bold" scroll-down arrow-up-bold ,map)
+          ("pen-plus" switch-to-buffer mark ,map)
+
+          ("file-find" find-file file-find ,map)
+          ("content-save" save-buffer content-save ,map)
+          ("feather" +company/complete complete ,map)
+          ("kill-buffer" delete-window kill-buffer ,map)
+          
+          ("transfer-left" tool-bar-item-cg quit ,map)
+          ("keyboard-tab" tool-bar-item-tab keyboard-tab ,map)
+          ("keyboard-off" android-toggle-keyboard android-toggle-keyboard ,map)
+          ("arrow-left-thin" tool-bar-item-left arrow-left-thin ,map)
+          ("arrow-down-thin" tool-bar-item-down arrow-down-thin ,map)
+          ("arrow-right-thin" tool-bar-item-right arrow-right-thin ,map)
+
+          ("content-cut" kill-region content-cut ,map)
+          ("content-copy" kill-ring-save content-copy ,map)
+          ("content-paste" yank content-paste ,map)
+          ("selection" er/expand-region selection ,map)
+          )
+  )
+)
+
+(define-key key-translation-map
+            [tool-bar apple-keyboard-command]
+            #'tool-bar-event-apply-control-modifier)
+(define-key key-translation-map
+            [tool-bar apple-keyboard-option]
+            #'tool-bar-event-apply-alt-modifier)
+(define-key key-translation-map
+            [tool-bar keyboard-esc]
+            [escape])
+(define-key key-translation-map
+            [tool-bar quit]
+            (kbd "C-g"))
+(define-key key-translation-map
+            [tool-bar keyboard-tab]
+            (kbd "TAB"))
+(define-key key-translation-map
+            [tool-bar arrow-up-thin]
+            [up])
+(define-key key-translation-map
+            [tool-bar arrow-down-thin]
+            [down])
+(define-key key-translation-map
+            [tool-bar arrow-left-thin]
+            [left])
+(define-key key-translation-map
+            [tool-bar arrow-right-thin]
+            [right])
+(android-tool-bar-configs)
+
+
+;;; org-mode 
+(use-package! org
+  :bind (:map org-mode-map
+	      ("C-C a" . org-agenda)
+	      ("C-'" . nil)
+	      ("M-l" . org-metaright)
+	      ("M-h" . org-metaleft)
+	      ("M-H" . org-shiftmetaleft)
+	      ("M-L" . org-shiftmetaright)
+	      ("M-=" . advance-words-count)
+	      :map global-map
+	      ("C-c n c" . org-capture)
+	      )
+  :hook
+  (
+   (org-mode . (lambda () (setq truncate-lines nil)))  
+   (org-mode . (lambda () (display-line-numbers-mode -1)))
+   (org-mode . (lambda ()
+		 ;; 设置折行
+		 (global-word-wrap-whitespace-mode 1)))
+   )
+  :custom
+    (org-default-notes-file (expand-file-name "notes.org" org-directory))
+  ;; 整体美化相关设置
+  ;;(org-ellipsis "⤵")
+  (org-startup-indented t)
+  (org-fontify-todo-headline nil)
+  (org-fontify-done-headline t)
+  (org-fontify-whole-heading-line t)
+  (org-fontify-quote-and-verse-blocks t)
+  (org-list-demote-modify-bullet '(("+" . "-") ("1." . "a.") ("-" . "+")))
+  ;; 设置 ORG 标题范围，使上面的尾标可以正确显示
+  (org-cycle-separator-lines 2)
+  ;; 上下标控制
+  (org-export-with-sub-superscripts '{})
+  (org-use-sub-superscripts '{})
+  (org-use-sub-superscripts '{})
+  (org-hide-emphasis-markers t)
+  (org-pretty-entities t)
+  ;; org 中图片大小
+  (org-image-actual-width nil)
+  ;; 其他设置
+  (org-imenu-depth 4)
+  (org-clone-delete-id t)
+  (org-use-sub-superscripts '{})
+  (org-yank-adjusted-subtrees t)
+  (org-ctrl-k-protect-subtree 'error)
+  (org-fold-catch-invisible-edits 'show-and-error)
+  (org-return-follows-link nil)
+  ;; 启动时缩进
+  (org-startup-indented t)
+  ;; 启动时折叠内容
+  (org-startup-folded t)
+  ;; TODO 结束时加上时间
+  (org-log-done 'time)
+  ;; TODO 设置
+  (org-todo-keywords '((sequence "TODO(t)"
+				 "DOING(i!)"
+				 "|"
+				 "DONE(d!)"
+				 "KILLED(k!)")))
+  (org-todo-keyword-faces '(("DONE"       :foreground "#7c7c75" :weight bold)
+                            ("DOING"       :foreground "#feb24c" :weight bold)
+                            ("TODO"       :foreground "#50a14f" :weight bold)
+                            ("KILLED"  :foreground "#ff6480" :weight bold)))
+  ;; 时间戳格式
+  (org-time-stamp-formats '("<%Y-%m-%d %A>" . "<%Y-%m-%d %A %H:%M>"))
+  (org-use-fast-todo-selection 'expert)
+  (org-enforce-todo-dependencies t)
+  (org-enforce-todo-checkbox-dependencies t)
+  (org-priority-faces '((?A :foreground "red")
+                        (?B :foreground "orange")
+                        (?C :foreground "yellow")))
+  (org-columns-default-format "%25ITEM %TODO %3PRIORITY %TAGS %CLOCKSUM")
+  ;; Remove CLOSED: [timestamp] after switching to non-DONE states
+  (org-closed-keep-when-no-todo t)
+  ;; refile
+  (org-refile-use-cache nil)
+  (org-refile-targets '((org-agenda-files . (:maxlevel . 6))))
+  (org-refile-use-outline-path 'file)
+  (org-outline-path-complete-in-steps nil)
+  (org-refile-allow-creating-parent-nodes 'confirm)
+  ;; tags, e.g. #+TAGS: keyword in your file
+  (org-use-fast-tag-selection t)
+  (org-fast-tag-selection-single-key t)
+  ;; id
+  (org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)
+  ;; abbreviation for url
+  (org-link-abbrev-alist '(("GitHub" . "https://github.com/")
+                           ("GitLab" . "https://gitlab.com/")
+                           ("Google" . "https://google.com/search?q=")
+                           ("RFCs"   . "https://tools.ietf.org/html/")
+                           ("LWN"    . "https://lwn.net/Articles/")
+                           ("WG21"   . "https://wg21.link/")
+			   ("bilibili" . "https://www.bilibili.com/video/%s")
+			   ("mengbai" . "https://mzh.moegirl.org.cn/zh-hans/%s")
+			   ("handian" . "https://www.zdic.net/hans/%s")))
+  )
+
+;;; UI Setting
+
