@@ -104,7 +104,7 @@
     (setq tool-bar-map '(keymap nil))
     (add-to-list 'image-load-path
                  (expand-file-name
-                  "module/tool-bar" doom-private-dir))
+                  "tool-bar" doom-private-dir))
     (android-general-tool-bar
      'tool-bar-add-item nil)))
 
