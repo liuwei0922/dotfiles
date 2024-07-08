@@ -146,7 +146,7 @@
             #'tool-bar-event-apply-control-modifier)
 (define-key key-translation-map
             [tool-bar apple-keyboard-option]
-            #'tool-bar-event-apply-alt-modifier)
+            #'tool-bar-event-apply-meta-modifier)
 (define-key key-translation-map
             [tool-bar keyboard-esc]
             [escape])
