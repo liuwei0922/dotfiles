@@ -282,3 +282,27 @@ with `org-cycle')."
 (add-hook 'after-init-hook
  (lambda ()
    (visual-line-mode -1)))
+
+;;; recentf mode
+;; (use-package recentf
+;;   :config
+;;   (setq recentf-save-file (concat user-emacs-directory "recentf"))
+;;   ;; 不自动清理 recentf 记录。
+;;   (setq recentf-auto-cleanup 'never)
+;;   ;; emacs 退出时清理 recentf 记录。
+;;   ;;(add-hook 'kill-emacs-hook #'recentf-cleanup)
+;;   ;; 每 5min 以及 emacs 退出时保存 recentf-list。
+;;   ;;(run-at-time nil (* 5 60) 'recentf-save-list)
+;;   ;;(add-hook 'kill-emacs-hook #'recentf-save-list)
+;;   (setq recentf-max-menu-items 100)
+;;   (setq recentf-max-saved-items 200) ;; default 20
+;;   ;; recentf-exclude 的参数是正则表达式列表，不支持 ~ 引用家目录。
+;;   ;; emacs-dashboard 不显示这里排除的文件。  
+;;   (setq recentf-exclude `(,(recentf-expand-file-name "~\\(straight\\|ln-cache\\|etc\\|var\\|.cache\\|backup\\|elfeed\\)/.*")
+;;                           ;;,(recentf-expand-file-name "~\\(recentf\\|bookmarks\\|archived.org\\)")
+;;                           ,tramp-file-name-regexp ;; 不在 recentf 中记录 tramp 文件，防止 tramp 扫描时卡住。
+;;                           "^/tmp" "\\.bak\\'" "\\.gpg\\'" "\\.gz\\'" "\\.tgz\\'" "\\.xz\\'" "\\.zip\\'" "^/ssh:" "\\.png\\'"
+;;                           "\\.jpg\\'" "/\\.git/" "\\.gitignore\\'" "\\.log\\'" "COMMIT_EDITMSG" "\\.pyi\\'" "\\.pyc\\'"
+;;                           "/private/var/.*" "^/usr/local/Cellar/.*" ".*/vendor/.*"
+;;                           ,(concat package-user-dir "/.*-autoloads\\.egl\\'")))
+;;   (recentf-mode +1))
