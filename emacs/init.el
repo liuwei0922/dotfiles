@@ -79,7 +79,7 @@
 ;; org-mode
 (require 'init-org)
 ;; count-words
-;;(require 'init-words)
+(require 'init-words)
 
 
 ;;; 自定义函数
