@@ -202,7 +202,7 @@ with `org-cycle')."
             t)))))
   (setq org-default-notes-file (expand-file-name "notes.org" org-directory))
   ;; 整体美化相关设置
-  ;;(org-ellipsis "⤵")
+  (org-ellipsis "⤵")
   (setq org-fontify-todo-headline nil)
   (setq org-fontify-done-headline t)
   (setq org-fontify-whole-heading-line t)
@@ -376,7 +376,7 @@ with `org-cycle')."
   (find-font (font-spec :name font-name)))
 ;; 设置 GUI 下的字体
 (setq doom-font (font-spec :family "FiraCode Nerd Font" :size 30))
-(setq doom-unicode-font (font-spec :family "LXGW WenKai Bold" :size 30))
+(setq doom-unicode-font (font-spec :family "LXGW WenKai" :size 30))
 ;; (defun +init-font ()
 ;;   ;; (set-face-attribute
 ;;   ;;  'default nil
