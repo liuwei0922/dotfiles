@@ -172,15 +172,13 @@
 
 
 ;;; org-mode 
-(use-package org
+(use-package! org
   :hook
   (
-   ;;(org-mode . (lambda () (setq-local truncate-lines nil)))
-   (org-mode . (lambda () (visual-line-mode -1)))
-   (org-mode . (lambda () (display-line-numbers-mode -1)))
-   ;; (org-mode . (lambda ()
-   ;; 		 ;; 设置折行
-   ;; 		 (global-word-wrap-whitespace-mode 1)))
+   (org-mode . (lambda ()
+		 (visual-line-mode -1)
+		 (display-line-numbers-mode -1)
+		 (setq-local fill-column 70)))   
    ;; 设置 ORG 标题样式
    (org-cycle-tab-first . +org-cycle-only-current-subtree-h)
    )
@@ -278,32 +276,156 @@ with `org-cycle')."
 			   ("handian" . "https://www.zdic.net/hans/%s")))
   )
 
-;;; UI Setting
-(add-hook 'after-init-hook
- (lambda ()
-   (visual-line-mode -1)))
-(setq fill-column 70)
+;;; org-agenda
+(use-package org-agenda
+  :hook
+  (org-agenda-finalize . org-agenda-to-appt)
+  :custom
+  (org-agenda-files (cond ((eq system-type 'gnu/linux) '("~/org/agenda/agenda.org"))
+			  ((eq system-type 'windows-nt) '("d:/onedrive/OneDrive - cumt.edu.cn/org/agenda"))))
+  ;; 在 org-agenda 中不显示所有日期
+  (org-agenda-show-all-dates nil)
+  ;; 设置查看完成的项目
+  (org-agenda-custom-commands
+   '(("r" "记录回顾"
+      ((agenda ""
+	       ((org-agenda-skip-function
+		 #'(lambda ()
+		     (org-back-to-heading t)
+		     (let ((level (org-current-level))
+			   (next-heading (save-excursion
+					   (outline-next-heading))))
+		       (if (or (< level +org-agenda-set-level)
+			       (= level +org-agenda-set-level))
+			   nil
+			 next-heading))))
+		(org-agenda-overriding-header "记录回顾")
+		(org-agenda-span 'year)
+		(org-agenda-start-on-weekday nil)
+		(org-agenda-start-day "-y")
+		(org-agenda-show-log 'only)
+		(org-agenda-show-all-dates nil)
+		)))
+      ((+org-agenda-set-level (string-to-number (read-string "level:")))))))
+  (org-agenda-current-time-string "现在 - - - - - - - - - - - - -")
+  (org-agenda-scheduled-leaders '("预 " "应%02d天前开始 "))
+  (org-agenda-deadline-leaders '("止 " "过%02d天后到期 " "已经过期%02d天 "))
+  (org-agenda-format-date #'+org-agenda-format-date-aligned)
+  :config
+  (defun +org-agenda-format-date-aligned (date)
+    "Format a DATE string for display in the daily/weekly agenda.
+This function makes sure that dates are aligned for easy reading."
+    (require 'cal-iso)
+    (let* ((dayname (calendar-day-name date))
+	   (day (cadr date))
+	   (day-of-week (calendar-day-of-week date))
+	   (month (car date))
+	   (monthname (calendar-month-name month))
+	   (year (nth 2 date))
+	   (iso-week (org-days-to-iso-week
+		      (calendar-absolute-from-gregorian date)))
+	   ;; (weekyear (cond ((and (= month 1) (>= iso-week 52))
+	   ;;        	  (1- year))
+	   ;;        	 ((and (= month 12) (<= iso-week 1))
+	   ;;        	  (1+ year))
+	   ;;        	 (t year)))
+	   (weekstring (if (= day-of-week 1)
+			   (format " W%02d" iso-week)
+			 "")))
+      (format "%4d年 - %s - %2d日 %-10s"
+	      year monthname day dayname)))
+  (defvar +org-agenda-set-level 2 "回顾时用到的层级数"))
 
-;;; recentf mode
-;; (use-package recentf
-;;   :config
-;;   (setq recentf-save-file (concat user-emacs-directory "recentf"))
-;;   ;; 不自动清理 recentf 记录。
-;;   (setq recentf-auto-cleanup 'never)
-;;   ;; emacs 退出时清理 recentf 记录。
-;;   ;;(add-hook 'kill-emacs-hook #'recentf-cleanup)
-;;   ;; 每 5min 以及 emacs 退出时保存 recentf-list。
-;;   ;;(run-at-time nil (* 5 60) 'recentf-save-list)
-;;   ;;(add-hook 'kill-emacs-hook #'recentf-save-list)
-;;   (setq recentf-max-menu-items 100)
-;;   (setq recentf-max-saved-items 200) ;; default 20
-;;   ;; recentf-exclude 的参数是正则表达式列表，不支持 ~ 引用家目录。
-;;   ;; emacs-dashboard 不显示这里排除的文件。  
-;;   (setq recentf-exclude `(,(recentf-expand-file-name "~\\(straight\\|ln-cache\\|etc\\|var\\|.cache\\|backup\\|elfeed\\)/.*")
-;;                           ;;,(recentf-expand-file-name "~\\(recentf\\|bookmarks\\|archived.org\\)")
-;;                           ,tramp-file-name-regexp ;; 不在 recentf 中记录 tramp 文件，防止 tramp 扫描时卡住。
-;;                           "^/tmp" "\\.bak\\'" "\\.gpg\\'" "\\.gz\\'" "\\.tgz\\'" "\\.xz\\'" "\\.zip\\'" "^/ssh:" "\\.png\\'"
-;;                           "\\.jpg\\'" "/\\.git/" "\\.gitignore\\'" "\\.log\\'" "COMMIT_EDITMSG" "\\.pyi\\'" "\\.pyc\\'"
-;;                           "/private/var/.*" "^/usr/local/Cellar/.*" ".*/vendor/.*"
-;;                           ,(concat package-user-dir "/.*-autoloads\\.egl\\'")))
-;;   (recentf-mode +1))
+(after! org-agenda
+  (setq parse-time-months
+        (append '(("yiyue" . 1) ("eryue" . 2) ("sanyue" . 3)
+                  ("siyue" . 4) ("wuyue" . 5) ("liuyue" . 6)
+                  ("qiyue" . 7) ("bayue" . 8) ("jiuyue" . 9)
+                  ("shiyue" . 10) ("shiyiyue" . 11) ("shieryue" . 12))
+                parse-time-months))
+  (setq parse-time-weekdays
+        (append '(("zri" . 0) ("zqi" . 0)
+                  ("zyi" . 1) ("zer" . 2) ("zsan" . 3)
+                  ("zsi" . 4) ("zwu" . 5) ("zliu" . 6)
+                  ("zr" . 0) ("zq" . 0)
+                  ("zy" . 1) ("ze" . 2) ("zs" . 3)
+                  ("zsi" . 4) ("zw" . 5) ("zl" . 6))
+                parse-time-weekdays)))
+
+(after! org-agenda
+	(setq calendar-week-start-day 1)
+	(setq calendar-month-name-array
+	      ["一月" "二月" "三月" "四月" "五月" "六月"
+               "七月" "八月" "九月" "十月" "十一月" "十二月"])
+	(setq calendar-day-name-array
+              ["星期天" "星期一" "星期二" "星期三" "星期四" "星期五" "星期六"])
+	)
+
+;;; 美化工具
+(use-package! org-bullets
+  :hook
+  (org-mode . (lambda () (org-bullets-mode 1))))
+
+;;; UI Setting
+(add-hook! 'after-init-hook
+	   (lambda ()
+	     (visual-line-mode -1)))
+
+
+;; 设置字体
+;; 判断字体是否存在
+(defun +font-installed-p (font-name)
+  "Check if font with FONT-NAME is available."
+  (find-font (font-spec :name font-name)))
+;; 设置 GUI 下的字体
+(defun +init-font ()
+  (when (display-graphic-p)  
+    ;; 设置英语字体
+    (cl-loop for font in '("Fira Code"  "FiraCode Nerd Font" "iosevka"
+			   "Consolas" "Cascadia Code" "SF Mono" "Source Code Pro"
+                            "Menlo" "Monaco" "Dejavu Sans Mono"
+                           "Lucida Console" "SAS Monospace")
+             when (+font-installed-p font)
+             return (set-face-attribute
+                     'default nil
+                     :font (font-spec :family font
+                                      :weight 'normal
+                                      :slant 'normal
+                                      :size 36)))
+
+    (cl-loop for font in '("Sarasa UI SC" "Symbol" "Symbola" "Segoe UI Symbol"  )
+             when (+font-installed-p font)
+             return (if (< emacs-major-version 27)
+                        (set-fontset-font "fontset-default" 'unicode font nil 'prepend)
+                      (set-fontset-font t 'symbol (font-spec :family font) nil 'prepend)))
+    
+    ;; 设置 emoji 字体
+    (cl-loop for font in '("Sarasa UI SC" "nerd-icons" "Symbola" "Noto Color Emoji"  
+                           "EmojiOne Color" "Apple Color Emoji" "Segoe UI Emoji"
+			   "OpenSansEmoji" )
+             when (+font-installed-p font) 
+             return (set-fontset-font t 'emoji
+                                      (font-spec :family font)
+                                      nil 'prepend)) 
+    ;; 设置中文字体
+    (cl-loop for font in '("LXGW Wenkai" "Sarasa Mono SC" "微软雅黑 CN" "思源黑体 CN" "思源宋体 CN" 
+                           "Source Han Sans CN" "Source Han Serif CN"
+                           "WenQuanYi Micro Hei" "文泉驿等宽微米黑"
+                           "Microsoft Yahei UI" "Microsoft Yahei")
+             when (+font-installed-p font)
+             return (set-fontset-font t 'chinese-gbk ;;'(#x4e00 . #x9fff)
+                                      (font-spec :name font
+						 :weight 'normal
+						 :slant 'normal
+						 :size 36)))
+    ;; (cl-loop for font in '("HanaMinB" "SimSun-ExtB")
+    ;;          when (+font-installed-p font)
+    ;;          return (set-fontset-font t '(#x20000 . #x2A6DF)
+    ;;                                   (font-spec :name font
+    ;; 						 :weight 'normal
+    ;; 						 :slant 'normal
+    ;; 						 :size (cond ((eq system-type 'gnu/linux) 32)
+    ;;                                                          ((eq system-type 'windows-nt) 12.5)))))
+    ))
+(add-hook! 'after-setting-font-hook
+	   #'+init-font)
