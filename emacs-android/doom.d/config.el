@@ -375,46 +375,13 @@ with `org-cycle')."
   "Check if font with FONT-NAME is available."
   (find-font (font-spec :name font-name)))
 ;; 设置 GUI 下的字体
+(setq doom-font (font-spec :family "FiraCode Nerd Font" :size 12))
 (defun +init-font ()
-  (when (display-graphic-p)  
-    ;; 设置英语字体
-    (cl-loop for font in '("Fira Code"  "FiraCode Nerd Font" "iosevka"
-			   "Consolas" "Cascadia Code" "SF Mono" "Source Code Pro"
-                            "Menlo" "Monaco" "Dejavu Sans Mono"
-                           "Lucida Console" "SAS Monospace")
-             when (+font-installed-p font)
-             return (set-face-attribute
-                     'default nil
-                     :font (font-spec :family font
-                                      :weight 'normal
-                                      :slant 'normal
-                                      :size 36)))
+  ;; 设置中文字体   
+  (set-fontset-font t 'chinese-gbk
+		    (font-spec :name "LXGW Wenkai Bold"
+			       :size 36))
+  )
+(add-hook 'doom-init-ui-hook #'+init-font)
+;;(add-hook 'after-setting-font-hook #'+init-font)
 
-    (cl-loop for font in '("Sarasa UI SC" "Symbol" "Symbola" "Segoe UI Symbol"  )
-             when (+font-installed-p font)
-             return (if (< emacs-major-version 27)
-                        (set-fontset-font "fontset-default" 'unicode font nil 'prepend)
-                      (set-fontset-font t 'symbol (font-spec :family font) nil 'prepend)))
-    
-    ;; 设置 emoji 字体
-    (cl-loop for font in '("Sarasa UI SC" "nerd-icons" "Symbola" "Noto Color Emoji"  
-                           "EmojiOne Color" "Apple Color Emoji" "Segoe UI Emoji"
-			   "OpenSansEmoji" )
-             when (+font-installed-p font) 
-             return (set-fontset-font t 'emoji
-                                      (font-spec :family font)
-                                      nil 'prepend)) 
-    ;; 设置中文字体
-    (cl-loop for font in '("LXGW Wenkai" "Sarasa Mono SC" "微软雅黑 CN" "思源黑体 CN" "思源宋体 CN" 
-                           "Source Han Sans CN" "Source Han Serif CN"
-                           "WenQuanYi Micro Hei" "文泉驿等宽微米黑"
-                           "Microsoft Yahei UI" "Microsoft Yahei")
-             when (+font-installed-p font)
-             return (set-fontset-font t 'chinese-gbk ;;'(#x4e00 . #x9fff)
-                                      (font-spec :name font
-						 :weight 'normal
-						 :slant 'normal
-						 :size 36)))
-    ))
-
-(add-hook 'after-setting-font-hook #'+init-font)
