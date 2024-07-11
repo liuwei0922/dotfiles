@@ -375,13 +375,17 @@ with `org-cycle')."
   "Check if font with FONT-NAME is available."
   (find-font (font-spec :name font-name)))
 ;; 设置 GUI 下的字体
-(setq doom-font (font-spec :family "FiraCode Nerd Font" :size 12))
+;;(setq doom-font (font-spec :family "FiraCode Nerd Font" :size 12))
 (defun +init-font ()
-  ;; 设置中文字体   
+  (set-face-attribute
+   'default nil
+   :font (font-spec :family "FiraCode Nerd Font"
+		    :size 36))
+  ;; 设置中文字体
   (set-fontset-font t 'chinese-gbk
 		    (font-spec :name "LXGW Wenkai Bold"
 			       :size 36))
   )
 (add-hook 'doom-init-ui-hook #'+init-font)
-;;(add-hook 'after-setting-font-hook #'+init-font)
+(add-hook 'after-setting-font-hook #'+init-font)
 
