@@ -380,11 +380,11 @@ with `org-cycle')."
   (set-face-attribute
    'default nil
    :font (font-spec :family "FiraCode Nerd Font"
-		    :size 36))
+		    :size 30))
   ;; 设置中文字体
-  (set-fontset-font t 'chinese-gbk
-		    (font-spec :name "LXGW Wenkai Bold"
-			       :size 36))
+  (dolist (charset '(kana han cjk-misc bopomofo))
+    (set-fontset-font (frame-parameter nil 'font)
+		      charset (font-spec :family "LXGW WenKai" :size 30)))
   )
 (add-hook 'doom-init-ui-hook #'+init-font)
 (add-hook 'after-setting-font-hook #'+init-font)
