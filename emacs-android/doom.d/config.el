@@ -376,7 +376,7 @@ with `org-cycle')."
   (find-font (font-spec :name font-name)))
 ;; 设置 GUI 下的字体
 (setq doom-font (font-spec :family "FiraCode Nerd Font" :size 30))
-(setq doom-unicode-font (font-spec :family "LXGW WenKai" :size 30))
+(setq doom-unicode-font (font-spec :name "LXGW WenKai" :size 30))
 ;; (defun +init-font ()
 ;;   ;; (set-face-attribute
 ;;   ;;  'default nil
