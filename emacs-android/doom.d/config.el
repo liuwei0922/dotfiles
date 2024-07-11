@@ -375,12 +375,12 @@ with `org-cycle')."
   "Check if font with FONT-NAME is available."
   (find-font (font-spec :name font-name)))
 ;; 设置 GUI 下的字体
-;;(setq doom-font (font-spec :family "FiraCode Nerd Font" :size 12))
+(setq doom-font (font-spec :family "FiraCode Nerd Font" :size 30))
 (defun +init-font ()
-  (set-face-attribute
-   'default nil
-   :font (font-spec :family "FiraCode Nerd Font"
-		    :size 30))
+  ;; (set-face-attribute
+  ;;  'default nil
+  ;;  :font (font-spec :family "FiraCode Nerd Font"
+  ;; 		    :size 30))
   ;; 设置中文字体
   (dolist (charset '(kana han cjk-misc bopomofo))
     (set-fontset-font (frame-parameter nil 'font)
