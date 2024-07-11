@@ -202,7 +202,7 @@ with `org-cycle')."
             t)))))
   (setq org-default-notes-file (expand-file-name "notes.org" org-directory))
   ;; 整体美化相关设置
-  (org-ellipsis "⤵")
+  (setq org-ellipsis "⤵")
   (setq org-fontify-todo-headline nil)
   (setq org-fontify-done-headline t)
   (setq org-fontify-whole-heading-line t)
