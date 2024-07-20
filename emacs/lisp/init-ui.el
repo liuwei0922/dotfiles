@@ -261,10 +261,7 @@
 
 ;; 启动时关闭系统输入法
 (when (eq system-type 'windows-nt)
-  (add-hook 'after-init-hook
-	    (lambda ()
-	      (when (w32-get-ime-open-status)
-		(w32-set-ime-open-status nil))))
+  (add-hook 'after-init-hook #'+close-ime)
   (defun +open-ime ()
     (interactive)
     (unless (w32-get-ime-open-status)
@@ -277,7 +274,8 @@
     (interactive)
     (if (w32-get-ime-open-status)
 	(w32-set-ime-open-status nil)
-      (w32-set-ime-open-status t))))
+      (w32-set-ime-open-status t)))
+  (+close-ime))
 (when (eq system-type 'gnu/linux)
   ;; 由于 fcitx 的显示不是很好，所以暂时在 wsl 中 emacs 中不使用系统输入法
   ;;(setq pgtk-use-im-context-on-new-connection nil)
@@ -285,6 +283,7 @@
 ;; rime 输入法
 (use-package rime
   :ensure t
+  :unless (eq system-type 'windows-nt)
   :custom
   (default-input-method "rime")
   (rime-cursor "˰")
@@ -314,7 +313,7 @@
     (interactive)
     (set-input-method "rime"))
   (cond ((eq system-type 'windows-nt)
-	 (setq rime-share-data-dir "c:/msys64/mingw64/share/rime-data"))
+	 (setq rime-share-data-dir "~/Rime"))
 	((eq system-type 'gnu/linux)
 	 (setq rime-share-data-dir "~/.local/share/fcitx5/rime")
 	 (setq rime-user-data-dir "~/.config/fcitx5/rime")
