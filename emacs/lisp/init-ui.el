@@ -322,6 +322,33 @@
   (setq-default pyim-cloudim nil)
   (setq-default pyim-candidates-search-buffer-p nil)
   (setq-default pyim-enable-shortcode nil)
+  (setq-default pyim-punctuation-translate-p '(auto))
+  ;; (setq-default pyim-english-input-switch-functions
+  ;;             '(pyim-probe-dynamic-english
+  ;; 		pyim-probe-program-mode
+  ;;               pyim-probe-org-structure-template))
+  (defun rime-predicate-after-ascii-char-p ()
+  "If the cursor is after a ascii character.
+
+Can be used in `rime-disable-predicates' and `rime-inline-predicates'."
+  (and (> (point) (save-excursion (back-to-indentation) (point)))
+       (let ((string (buffer-substring (point) (max (line-beginning-position) (- (point) 80)))))
+         (string-match-p "[a-zA-Z0-9\x21-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]$" string))))
+  (defun rime-predicate-space-after-cc-p ()
+    "If cursor is after a whitespace which follow a non-ascii character."
+    (and (> (point) (save-excursion (back-to-indentation) (point)))
+	 (let ((string (buffer-substring (point) (max (line-beginning-position) (- (point) 80)))))
+           (string-match-p "\\cc +$" string))))
+  (defun rime-predicate-space-after-ascii-p ()
+    "If cursor is after a whitespace which follow a ascii character."
+    (and (> (point) (save-excursion (back-to-indentation) (point)))
+	 (let ((string (buffer-substring (point) (max (line-beginning-position) (- (point) 80)))))
+           (and (string-match-p " +$" string)
+		(not (string-match-p "\\cc +$" string))))))
+  (setq-default pyim-english-input-switch-functions
+		'(rime-predicate-space-after-cc-p
+		  pyim-probe-program-mode
+		  rime-predicate-after-ascii-char-p))
   (pyim-scheme-add
    '(flypy
      :document "小鹤音形输入法"
