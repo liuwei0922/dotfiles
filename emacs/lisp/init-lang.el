@@ -38,12 +38,40 @@
   (c-mode . eglot-ensure)
   (c++-mode . eglot-ensure)
   (c++-ts-mode . eglot-ensure)
+  ;;(python-mode . eglot-ensure)
   :config
-  (add-to-list 'eglot-server-programs '((c++-mode c++-ts-mode c-mode) "clangd")))
+  (add-to-list 'eglot-server-programs '((c++-mode c++-ts-mode c-mode) "clangd"))
+  ;;(add-to-list 'eglot-server-programs '((python-mode) "pylsp"))
+  )
 (use-package eldoc
   :defer t
+  :ensure t
+  :config
+  (setq eldoc-echo-area-use-multiline-p nil))
+
+
+;;; format-all
+;; 这个东西是需要 clang-format 的
+(use-package format-all
   :ensure t)
 
+
+;;; copilot
+;; (use-package copilot
+;;   :load-path "~/.emacs.d/elpa/copilot.el/"
+;;   ;; :hook
+;;   ;;(prog-mode . copilot-mode)
+;;   :bind (:map copilot-completion-map
+;;               ("<tab>" . 'copilot-accept-completion)
+;;               ("TAB" . 'copilot-accept-completion)
+;;               ("C-TAB" . 'copilot-accept-completion-by-word)
+;;               ("C-<tab>" . 'copilot-accept-completion-by-word))
+;;   :config
+;;   ;;(add-to-list 'copilot-major-mode-alist '())
+;;   ;;(setq copilot-node-executable "c:/Users/qinmo/scoop/apps/nvm-windows/current/nodejs/nodejs/node.exe")
+;;   (setq copilot-network-proxy '(:host "127.0.0.1" :port 10809))
+;;   )
+;; you can utilize :map :hook and :config to customize copilot
 
 ;;; tree-sitter
 ;; 1. 编译emacs29.1  
@@ -51,6 +79,7 @@
 ;;(add-to-list 'treesit-extra-load-path "~/.config/emacs/tree-sitter/")
 ;;3. melpa 下载 tree-auto
 (use-package treesit-auto
+  :unless (eq system-type 'windows-nt)
   :ensure t
   :config
   (global-treesit-auto-mode)
@@ -65,6 +94,20 @@
   ;; (setq treesit-load-name-override-list
   ;; 	'((c++ "libtree-sitter-cpp" "tree_sitter_cpp")))
   )
+
+(use-package docstr
+  :ensure t
+  )
+(use-package cmake-mode
+  :ensure t)
+
+
+;;; python
+;; (use-package jedi
+;;   :ensure t
+;;   :hook
+;;   (python-mode . #'jedi:setup)
+;;   )
 
 
 (provide 'init-lang)

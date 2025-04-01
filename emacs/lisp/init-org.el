@@ -26,10 +26,12 @@
 	      ("C-c n c" . org-capture)
 	      )
   :hook
-  ((org-mode . (lambda () (unless buffer-read-only
-			    (set-input-method "rime"))))
+  (;; (org-mode . (lambda () (unless buffer-read-only
+   ;; 			    (set-input-method "rime"))))
    ;;(org-mode . (lambda () (display-line-numbers-mode -1)))
-   (org-mode . (lambda () (setq truncate-lines nil)))  
+   (org-mode . (lambda () (setq-local fill-column 80) ;;(visual-line-mode)
+		 (setq-local truncate-lines nil)
+		 ))  
    (org-mode . (lambda () (yas-activate-extra-mode 'latex-mode)))
    (org-mode . (lambda () (display-line-numbers-mode -1)))
    ;; 设置 ORG 标题样式
@@ -40,7 +42,8 @@
    )
   :custom
   ;; 文件相关设置
-  (org-directory "~/org/")
+  (org-directory (cond ((eq system-type 'windows-nt) "C:/Users/qinmo/OneDrive/org/")
+		       ((eq system-type 'linux) "~/org/")))
   (org-default-notes-file (expand-file-name "notes.org" org-directory))
   ;; 整体美化相关设置
   (org-ellipsis "⤵")
@@ -57,7 +60,7 @@
   (org-use-sub-superscripts '{})
   (org-use-sub-superscripts '{})
   (org-hide-emphasis-markers t)
-  (org-pretty-entities t)
+  (org-pretty-entities nil)
   ;; org 中图片大小
   (org-image-actual-width nil)
   ;; 其他设置
@@ -79,13 +82,15 @@
 				 "DOING(i!)"
 				 "|"
 				 "DONE(d!)"
-				 "KILLED(k!)")))
+				 "KILLED(k!)"
+				 )))
   (org-todo-keyword-faces '(("DONE"       :foreground "#7c7c75" :weight bold)
                             ("DOING"       :foreground "#feb24c" :weight bold)
                             ("TODO"       :foreground "#50a14f" :weight bold)
                             ("KILLED"  :foreground "#ff6480" :weight bold)))
   ;; 时间戳格式
   (org-time-stamp-formats '("<%Y-%m-%d %A>" . "<%Y-%m-%d %A %H:%M>"))
+  (org-read-date-prefer-future nil)
   (org-use-fast-todo-selection 'expert)
   (org-enforce-todo-dependencies t)
   (org-enforce-todo-checkbox-dependencies t)
@@ -127,7 +132,10 @@
      "rm -fr %b.bbl %b.out %b.log %b.tex auto"
      ))
   (org-preview-latex-default-process 'xdvsvgm)
-  (org-preview-latex-image-directory "~/org/ltximg/")
+  (org-preview-latex-image-directory (pcase system-type
+				       ('windows-nt "C:/Users/qinmo/OneDrive/org/ltximg/")
+				       ('linux "~/org/ltximg/")))
+  
   (org-preview-latex-process-alist
    '((dvipng :programs
 	     ("latex" "dvipng")
@@ -145,7 +153,7 @@
 	      :message "you need to install the programs: xelatex and dvisvgm."
 	      :image-input-type "xdv"
 	      :image-output-type "svg"
-	      :image-size-adjust (1.7 . 1.5)
+	      :image-size-adjust (1.5 . 1.3)
 	      :latex-compiler
 	      ("xelatex -interaction nonstopmode -no-pdf -output-directory %o %F")
 	      :image-converter
@@ -159,7 +167,7 @@
 		  :image-converter
 		  ("convert -density %D -trim -antialias %F -quality 100 %O"))))
 
-  :config
+  :config  
   ;; 显示上下标
   ;;(org-toggle-pretty-entities)
   ;; 设置 TAB 键只有两层循环
@@ -181,6 +189,7 @@ with `org-cycle')."
             (org-cycle-internal-local)
             t)))))
   (add-to-list 'org-file-apps '("\\.pdf\\'" . "okular"))
+  (setq org-id-link-to-org-use-id 'create-if-interactive)
   )
 
 (use-package ox-latex
@@ -238,7 +247,7 @@ with `org-cycle')."
   (org-agenda-finalize . org-agenda-to-appt)
   :custom
   (org-agenda-files (cond ((eq system-type 'gnu/linux) '("~/org/agenda/agenda.org"))
-			  ((eq system-type 'windows-nt) '("d:/onedrive/OneDrive - cumt.edu.cn/org/agenda"))))
+			  ((eq system-type 'windows-nt) '("C:\\Users\\qinmo\\OneDrive\\org\\agenda\\agenda.org"))))
   ;; 在 org-agenda 中不显示所有日期
   (org-agenda-show-all-dates nil)
   ;; 设置查看完成的项目
@@ -294,7 +303,7 @@ This function makes sure that dates are aligned for easy reading."
 
 
 (use-package parse-time
-  :after org-agenda
+  :after org
   :ensure nil
   :config
   (setq parse-time-months
@@ -313,7 +322,7 @@ This function makes sure that dates are aligned for easy reading."
                 parse-time-weekdays)))
 
 (use-package calendar
-  :after (:or org-agenda hledger-mode)
+  :after (:or org hledger-mode)
   :ensure nil
   :config
   (setq calendar-week-start-day 1)
@@ -330,6 +339,15 @@ This function makes sure that dates are aligned for easy reading."
   :hook
   (org-capture-mode . +org-capture-setup)
   :config
+  (defun org-remove-id-from-last-capture ()
+    "Remove ID property from last `org-capture' entry, save capture buffer."
+    (interactive)	
+    (let* ((properties (org-entry-properties org-capture-last-stored-marker))
+           (file (cdr (assoc "FILE" properties)))) 
+      (when (org-entry-delete org-capture-last-stored-marker "CUSTOM_ID")
+	(with-current-buffer (get-file-buffer file)
+          (save-buffer)))))
+  (add-hook 'org-capture-after-finalize-hook #'org-remove-id-from-last-capture)
   (with-no-warnings
     (defun +org-capture-setup ()
       (setq-local org-complete-tags-always-offer-all-agenda-tags t)))
@@ -426,15 +444,15 @@ This function makes sure that dates are aligned for easy reading."
   (org-capture-bookmark nil)
   (org-capture-use-agenda-date t)
   (org-capture-templates
-   '(("t" "TODO" entry (file+headline org-agenda-files "Collect")
+   `(("t" "TODO" entry (file+headline org-agenda-files "Collect")
       "* TODO %? %^G \n  %U" :empty-lines 1)
      ("s" "Scheduled TODO" entry (file+headline "" "Collect")
       "* TODO %? %^G \nSCHEDULED: %^t\n  %U" :empty-lines 1)
      ("d" "Deadline" entry (file+headline "" "Collect")
       "* TODO %? %^G \n  DEADLINE: %^t" :empty-lines 1)
-     ("n" "Note" plain (file+function +capture-filename +capture-title)
-      "** %^{标题} \n:PROPERTIES:\n:CREATED: %U\n:ID: %(+capture-set-id) \n:END: \n%?")
-     ("j" "Journal" entry (file+datetree "~/org/nichijou.org")
+     ;; ("n" "Note" plain (file+function +capture-filename +capture-title)
+     ;;  "** %^{标题} \n:PROPERTIES:\n:CREATED: %U\n:ID: %(+capture-set-id) \n:END: \n%?")
+     ("j" "Journal" entry (file+datetree ,(concat org-directory "nichijou.org"))
       "* %^{标题} \nChanged at %U\n%?"))))
 
 
@@ -491,7 +509,7 @@ This function makes sure that dates are aligned for easy reading."
    ("C-c n R" . denote-rename-file-using-front-matter)
    )
   :config
-  (setq denote-directory (expand-file-name "~/org/notes/")
+  (setq denote-directory (expand-file-name (concat org-directory "notes/"))
 	denote-known-keywords '("read")
 	denote-infer-keywords t
 	denote-sort-keywords t
@@ -509,27 +527,35 @@ This function makes sure that dates are aligned for easy reading."
   :after org
   :hook
   ((org-mode dired-mode) . org-download-enable)
+  :bind
+  (:map org-mode-map
+	("C-c C-x y" . #'org-download-screenshot))
   :config
+  (setq-default +org-download-image-width 1200)
+  (defun +org-download-annotate-function (link)
+    "Annotate LINK with the time of download."
+    (format "#+DOWNLOADED: %s @ %s\n#+ATTR_ORG: :width %d\n"
+            (if (equal link org-download-screenshot-file)
+		"screenshot"
+              link)
+            (format-time-string "%Y-%m-%d %H:%M:%S")
+	    +org-download-image-width))
+  (setq-default org-download-annotate-function #'+org-download-annotate-function)
   (when (eq +system-type 'wsl)
     (defun org-download-clipboard (&optional basename)
-	  "Capture the image from the clipboard and insert the resulting file."
-	  (interactive)
-	  (let ((org-download-screenshot-method
-		 (if (executable-find "wl-paste")
-		     "wl-paste -t image/bmp | convert bmp:- %s"
-		   (user-error
-		    "Please install the \"wl-paste\" program included in wl-clipboard"))))
-	    (org-download-screenshot basename))))
-  ;; (defun +org-download-method (link)
-  ;;   (org-download--fullname (org-link-unescape link)))
-  ;; :custom
-  ;; (org-download-method #'+org-download-method)
-  ;; (org-download-annotate-function (lambda (_link) ""))
-  ;; (org-download-method 'attach)
-  ;; (org-download-screenshot-method "powershell.exe -Command \"(Get-Clipboard -Format image).Save('$(wslpath -w %s)')\"")
+      "Capture the image from the clipboard and insert the resulting file."
+      (interactive)
+      (let ((org-download-screenshot-method
+	     (if (executable-find "wl-paste")
+		 "wl-paste -t image/bmp | convert bmp:- %s"
+	       (user-error
+		"Please install the \"wl-paste\" program included in wl-clipboard"))))
+	(org-download-screenshot basename))))
+  (when (eq +system-type 'windows-nt)
+    (setq-default org-download-image-dir (concat org-directory "/images"))
+    (setq org-download-screenshot-method
+	  "powershell.exe -Command \"(Get-Clipboard -Format image).Save('%s')\""))
   )
-
-
 
 ;;; xenops
 (use-package xenops
@@ -574,13 +600,13 @@ This function makes sure that dates are aligned for easy reading."
   :defer t
   :after (:any org latex)
   :custom
-  (citar-bibliography '("~/org/bibliography/references.bib"))
-  (citar-notes-paths '("~/org/notes"))
-  (org-cite-global-bibliography '("~/org/bibliography/references.bib"))
+  (citar-bibliography `(,(concat org-directory "bibliography/references.bib")))
+  (citar-notes-paths `(,(concat org-directory "notes") ))
+  (org-cite-global-bibliography `(,(concat org-directory "bibliography/references.bib")))
   (org-cite-insert-processor 'citar)
   (org-cite-follow-processor 'citar)
   (org-cite-activate-processor 'citar)
-  (citar-library-paths '("~/org/bibtex-pdfs"))
+  (citar-library-paths `(,(concat "bibtex-pdfs")))
   (citar-at-point-function 'embark-act)
   ;;(advice-add 'citar-file-open :override #'citar-file-open-external)
   :hook
@@ -594,6 +620,7 @@ This function makes sure that dates are aligned for easy reading."
     (add-to-list 'display-buffer-alist '("*Async Shell Command*" display-buffer-no-window (nil)))
     (pcase +system-type
       ('wsl (async-shell-command (concat "wslview " file)))
+      ('windows-nt (async-shell-command (concat "cmd.exe /c start " file)))
       ))
   (add-to-list 'citar-file-open-functions '("pdf" . +okular-open-pdf)))
 
@@ -610,17 +637,17 @@ This function makes sure that dates are aligned for easy reading."
   :ensure t
   :after org
   :custom
-  (biblio-download-directory "~/org/bibtex-pdfs/")
+  (biblio-download-directory (concat org-directory "bibtex-pdfs/"))
   )
 
 (use-package ebib
   :ensure t
   :after org
   :custom
-  (ebib-default-directory "~/org/bibliography/")
-  (ebib-bib-search-dirs "~/org/bibliography/")
-  (ebib-file-search-dirs '("~/org/bibtex-pdfs"))
-  (ebib-preload-bib-files '("~/org/bibliography/references.bib"))
+  (ebib-default-directory (concat org-directory "bibliography/"))
+  (ebib-bib-search-dirs (concat org-directory "bibliography/"))
+  (ebib-file-search-dirs `(,(concat org-directory "bibtex-pdfs")))
+  (ebib-preload-bib-files `(,(concat org-directory "bibliography/references.bib")))
   (ebib-bibtex-dialect 'biblatex)
   (ebib-file-associations '(("pdf" . +okular-open-pdf)))
   )
@@ -728,27 +755,20 @@ This function makes sure that dates are aligned for easy reading."
 ;;   :ensure nil
 ;;   :after valign)
 
-
-
-;;; org-download
-;; (defun my-yank-image-from-win-clipboard-through-powershell()
-;;   "to simplify the logic, use c:/Users/Public as temporary directoy, and move it into current directoy"
-;;   (interactive)
-;;   (let* ((powershell "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe")
-;;          (file-name (format-time-string "screenshot_%Y%m%d_%H%M%S.png"))
-;;          ;; (file-path-powershell (concat "c:/Users/\$env:USERNAME/" file-name))
-;;          (file-path-wsl (concat "./images/" file-name))
-;;          )
-;;     ;; (shell-command (concat powershell " -command \"(Get-Clipboard -Format Image).Save(\\\"C:/Users/\\$env:USERNAME/" file-name "\\\")\""))
-;;     (shell-command (concat powershell " -command \"(Get-Clipboard -Format Image).Save(\\\"C:/Users/Public/" file-name "\\\")\""))
-;;     (rename-file (concat "/mnt/c/Users/Public/" file-name) file-path-wsl)
-;;     (insert (concat "[[file:" file-path-wsl "]]"))
-;;     (message "insert DONE.")
-;;     ))
-
 ;; markdown-mode
 ;; (use-package markdown-mode
 ;;   :ensure nil)
+
+
+;;; org-mime
+;; (use-package org-mime
+;;   :ensure t
+;;   :after (:or org mu4e)
+;;   ;;:config
+;;   ;;(setq org-mime-library 'mml)
+  
+;;   )
+
 
 
 (provide 'init-org)

@@ -73,8 +73,9 @@
 	register-preview-function #'consult-register-format)
   (advice-add #'register-preview :override #'consult-register-window)
   ;;筛选去掉带 * 的 buffer
-  (add-to-list 'consult-buffer-filter "\\`\\*Messages\\*\\'")
-  (add-to-list 'consult-buffer-filter "\\`\\*Async-native-compile-log\\*\\'")
+  (add-to-list 'consult-buffer-filter "\\`\\*[A-Za-z-:/ ]+\\*\\'")
+  ;;(add-to-list 'consult-buffer-filter "\\`\\*Messages\\*\\'")
+  ;;(add-to-list 'consult-buffer-filter "\\`\\*Async-native-compile-log\\*\\'")
   :custom
   (consult--fontify-preserve nil)
   (consult-async-min-input 2)
@@ -102,7 +103,24 @@
   :ensure t
   :custom
   (completion-styles '(orderless basic))
-  (completion-category-overrides '((file (styles basic partial-completion)))))
+  (completion-category-overrides '((file (styles basic partial-completion))))
+  ;;:config
+  ;;(add-to-list 'orderless-matching-styles 'orderless-flex)
+  )
+
+
+     
+;;; prescient
+;; (use-package prescient
+;;   :ensure t)
+
+;; (use-package corfu-prescient
+;;   :ensure t
+;;   :after corfu
+;;   :config
+;;   (corfu-prescient-mode))
+
+;;(use-pa)
 
 ;;; company-mode
 ;; (use-package company
@@ -128,19 +146,22 @@
 ;;; corfu
 (use-package corfu
   :ensure t
+   :bind
+  (:map corfu-map
+	("S-SPC" . corfu-insert-separator))
   ;; Optional customizations
   :custom
   (corfu-cycle t) ;; Enable cycling for `corfu-next/previous'
   (corfu-auto t)  ;; Enable auto completion
   (corfu-auto-prefix 2)
-  ;;(corfu-separator ?\s)	;; Orderless field separator
-  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-  ;;(corfu-quit-no-match t) ;; Never quit, even if there is no match
-  (corfu-preview-current nil) ;; Disable current candidate preview
-  ;;(corfu-preselect 'prompt)	  ;; Preselect the prompt
-  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
-  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
-
+  (corfu-separator ?\s)	      ;; Orderless field separator
+  ;;(corfu-quit-at-boundary t)  ;; Never quit at completion boundary
+  (corfu-quit-no-match t)     ;; Never quit, even if there is no match
+  ;;(corfu-preview-current nil) ;; Disable current candidate preview
+  ;;(corfu-preselect 'prompt)   ;; Preselect the prompt
+  ;;(corfu-on-exact-match nil)  ;; Configure handling of exact matches
+  (corfu-scroll-margin 5)     ;; Use scroll margin
+  (text-mode-ispell-word-completion nil)
   ;; Enable Corfu only for certain modes.
   :hook ((prog-mode . corfu-mode)
 	 (shell-mode . corfu-mode)
@@ -151,6 +172,7 @@
   ;; `global-corfu-modes' to exclude certain modes.
   :init
   (global-corfu-mode))
+
 
 ;; (use-package nerd-icons-corfu
 ;;   :ensure t

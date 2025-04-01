@@ -14,34 +14,32 @@
 (require 'init-utils)
 
 ;;; 设置用户名和邮箱
-(setq user-full-name "qinmoxiao")
-(setq user-mail-address "qinmoxiao@qq.com")
+(setq user-full-name "lyuweii")
+(setq user-mail-address "wliu@ihep.ac.cn")
 
 
 ;;; 文件相关设置
 ;; 设置环境变量
 (when (eq +system-type 'windows-nt)
-  (setenv "PATH" (concat "C:\\msys64\\mingw64\\bin;"
-			 "C:\\msys64\\usr\\bin;"
-			 "D:\\Program Files\\Steel Bank Common Lisp;"
-			 "D:\\program Files\\Rust\\.cargo\\bin;"
-			 "D:\\Program Files\\Rust\\.rustup\\toolchains\\table-x86_64-pc-windows-gnu\\bin;"
-			 (getenv "PATH")))
-  (setq exec-path (split-string (getenv "PATH") path-separator))
+  ;;(setq exec-path (split-string (getenv "PATH") path-separator))
   ;; 设置各种文件编码
-  (setq buffer-file-coding-system 'utf-8-unix
-	default-file-name-coding-system 'utf-8-unix
-	default-keyboard-coding-system 'utf-8-unix
-	default-process-coding-system '(utf-8-unix . utf-8-unix)
-	default-sendmail-coding-system 'utf-8-unix
-	default-terminal-coding-system 'utf-8-unix)
+  (setq-default buffer-file-coding-system 'utf-8-unix
+		default-file-name-coding-system 'utf-8-unix
+		default-keyboard-coding-system 'utf-8-unix
+		default-process-coding-system '(utf-8-unix . utf-8-unix)
+		default-sendmail-coding-system 'utf-8-unix
+		default-terminal-coding-system 'utf-8-unix
+		system-time-locale "CHS"
+	)
+   (setq locale-coding-system 'utf-8)
+  ;;(set-locale-environment "CHS")
   ;; (setq locale-coding-system 'gb18030)  ;此句保证中文字体设置有效
   ;; (setq w32-unicode-filenames 'nil)       ; 确保file-name-coding-system变量的设置不会无效
   ;; (setq file-name-coding-system 'gb18030) ; 设置文件名的编码为gb18030
   )
 ;; 默认文件编码
 (prefer-coding-system 'utf-8)
-(setq buffer-file-coding-system 'utf-8-unix)
+(setq-default buffer-file-coding-system 'utf-8-unix)
 ;; 自动保存
 (add-hook 'find-file-hook
 	  (lambda ()
@@ -63,7 +61,8 @@
 ;; 设置 C-l 的滚动状态
 (setq recenter-positions '(middle 0.05 bottom))
 ;; 设置像素滚动
-(pixel-scroll-precision-mode t)
+(setq pixel-scroll-precision-mode t)
+(setq pixel-scroll-mode t)
 ;; 浏览器设置 chrome
 (if (eq +system-type 'wsl)
     (setq browse-url-generic-program  "/mnt/c/Windows/System32/cmd.exe"
@@ -224,14 +223,18 @@
 ;; transparent remote access
 (use-package tramp
   :ensure nil
-  :custom
-  ;; Always use file cache when using tramp
-  (remote-file-name-inhibit-cache nil)
-  (tramp-default-method "sshx")
+  ;;:custom
+  ;; Always use file cache when using
+  ;; (remote-file-name-inhibit-cache nil)
   :config
   (setq tramp-verbose 10)
-  (add-to-list 'tramp-remote-path "/home/lhaaso/wliu/.local/bin")
-  (add-to-list 'tramp-remote-path "/home/liuwei/.local/bin")
+  (setq tramp-default-method
+	(cond ((eq system-type 'windows-nt)
+	        "plink")))
+  ;;(add-to-list 'tramp-remote-path "/home/lhaaso/wliu/.local/bin")
+  ;;(add-to-list 'tramp-remote-path "/home/liuwei/.local/bin")
+  (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+  (add-to-list 'tramp-remote-path "/cvmfs/slurm.ihep.ac.cn/alma9/anaconda3/bin")
   ;; (connection-local-set-profile-variables
   ;;  'remote-bash
   ;;  '((explicit-shell-file-name . "/bin/bash")
@@ -331,7 +334,9 @@
   :hook
   ;;取消下划线
   (eshell-mode . (lambda () (setq global-hl-line-mode nil)))
-  (eshell-mode . (lambda () (display-line-numbers-mode -1))))
+  (eshell-mode . (lambda () (display-line-numbers-mode -1)))
+  :config
+  (add-to-list 'eshell-modules-list 'eshell-tramp))
 
 ;;; vterm
 (use-package vterm
@@ -505,9 +510,11 @@
 
 
 ;; consult-yasnippet
-;; (use-package consult-yasnippet
-;;   :ensure nil
-;;   )
+(use-package consult-yasnippet
+  :ensure t
+  :bind
+  ("C-x y" . #'consult-yasnippet)
+  )
 
 ;; (use-package ivy-yasnippet
 ;;   :ensure t
@@ -528,11 +535,102 @@
 ;;   :http-server "172.17.224.1:10811"
 ;;   )
 
-;; 收发邮件
-;; (use-package wanderlust
-;;   :ensure t
-;;   :config
-;;   (require 'mail))
+;; loaddefs
+(use-package autoinsert
+  :ensure nil
+  :commands auto-insert
+  ;;:init
+  ;; 不提醒
+  ;;(setq auto-insert-query nil)
+  ;;(auto-insert-mode 1)
+  :config
+  (defun maple//insert-string()
+    (concat
+     (make-string 80 ?*)
+     "\n"
+     "Copyright © " (substring (current-time-string) -4) " " (user-full-name) "\n"
+     "File Name: " (file-name-nondirectory buffer-file-name) "\n"
+     "Author: " (user-full-name)"\n"
+     "Email: " user-mail-address "\n"
+     "Created: " (format-time-string "%Y-%m-%d %T (%Z)" (current-time)) "\n"
+     "Last Update: \n"
+     "         By: " (user-full-name) "\n"
+     "Description: \n"
+     (make-string 80 ?*)))
+  (defun maple/insert-string(&optional prefix)
+    (or prefix (setq prefix comment-start))
+    (mapconcat
+     (lambda (x) (concat prefix x))
+     (split-string (maple//insert-string) "\n") "\n"))
+  (when (boundp 'auto-insert-alist)
+    (setq auto-insert-alist
+	  (append auto-insert-alist
+		  '(((ruby-mode . "Ruby program") nil
+		     "#!/usr/bin/env ruby\n"
+		     "# -*- encoding: utf-8 -*-\n"
+		     (maple/insert-string) "\n")
+		    ((shell-script-mode . "shell program") nil
+		     "#!/bin/env bash\n"
+		     (male/insert-string) "\n")
+		    ((python-mode . "Python program") nil
+		     "#!/usr/bin/env python\n"
+		     "# -*- coding: utf-8 -*-\n"
+		     (maple/insert-string) "\n")
+		    ((c-mode . "C program") nil
+		     "/*"
+		     (string-trim-left (maple/insert-string " ")) "*/\n"
+		     "#include<stdio.h>\n"
+		     "#include<string.h>\n")
+		    ((sh-mode . "Shell script") nil
+		     "#!/bin/env bash\n"
+		     (maple/insert-string) "\n")
+		    ((go-mode . "Go program") nil
+		     "/*"
+		     (string-trim-left (maple/insert-string " ")) "*/\n")
+		    ((fundamental-mode . "README") nil
+		     (maple/insert-string) "\n")))))
+  )
+
+(use-package time-stamp
+  :config
+  (add-hook 'before-save-hook 'time-stamp)
+  (setq time-stamp-active t)
+  (setq time-stamp-line-limit 11)
+  (setq time-stamp-start "[lL]ast[ -][uU]pdate[ \t]*:?")
+  (setq time-stamp-end "\n")
+  (setq time-stamp-format " %#A %Y-%02m-%02d %02H:%02M:%02S (%Z)")
+  (defun maple/header-update-action(name)
+    "A."
+    (let ((beg (match-beginning 2))
+          (end (match-end 2)))
+      (when (not (string= name (string-trim-left (match-string 2))))
+	(goto-char beg)
+	(delete-region beg end)
+	(insert " " name))))
+  (defun maple/header-update(regex default line-limit)
+    "B."
+    (interactive)
+    (save-excursion
+      (goto-char (point-min))
+      (let ((lines 0))
+	(while (< lines line-limit)
+          (when (and (looking-at regex))
+            (maple/header-update-action default))
+          (setq lines (1+ lines))
+          (forward-line 1)))))
+  (defmacro maple/header-update-engine (name regex default &optional line-limit)
+    "C."
+    `(defun ,(intern (format "maple/header-update-%s" name)) ()
+       ,(format "Update %s with regex." name)
+       (interactive)
+       (maple/header-update ,regex ,default ,(or line-limit 7))))
+  (maple/header-update-engine "filename"
+                            ".*\\(File Name:\\)\\(.*\\)"
+                            (file-name-nondirectory (buffer-file-name)) 7)
+  )
+
+
+
 
 
 (provide 'init-base)
